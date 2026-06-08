@@ -3,73 +3,490 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>My Properties | Nalu by Monaco</title>
+<title>Buyer Portal | Nalu by Monaco</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
-*{margin:0;padding:0;box-sizing:border-box;}
-body{background:#0a0a0a;color:#fff;font-family:Georgia,serif;min-height:100vh;}
-header{padding:24px 32px;border-bottom:1px solid #1a1a1a;display:flex;justify-content:space-between;align-items:center;}
-header h1{color:#c9a84c;letter-spacing:5px;font-size:22px;font-weight:normal;}
-header span{color:#555;font-size:12px;letter-spacing:2px;}
-.greeting{padding:40px 32px 8px;font-size:24px;}
-.greeting strong{color:#c9a84c;}
-hr{border:none;border-top:1px solid #1a1a1a;margin:0 32px 32px;}
-.property-card{margin:0 24px 32px;background:#111;border:1px solid #1a1a1a;}
-.property-header{padding:28px 28px 20px;border-bottom:1px solid #1a1a1a;}
-.property-header h2{font-size:22px;font-weight:normal;margin-bottom:6px;}
-.address{color:#666;font-size:12px;letter-spacing:1px;}
-.property-meta{padding:20px 28px;display:grid;grid-template-columns:1fr 1fr;gap:16px;border-bottom:1px solid #1a1a1a;}
-.meta-item label{display:block;color:#666;font-size:10px;letter-spacing:2px;margin-bottom:6px;}
-.meta-item span{color:#c9a84c;font-size:18px;}
-.docs-section{padding:20px 28px;}
-.docs-section h3{color:#666;font-size:10px;letter-spacing:3px;margin-bottom:16px;}
-a.file-item{display:flex;align-items:center;background:#0d0d0d;border:1px solid #1a1a1a;padding:16px 20px;margin-bottom:8px;cursor:pointer;text-decoration:none;color:#fff;transition:border-color 0.2s;}
-a.file-item:hover{border-color:#c9a84c;}
-.file-icon{width:36px;height:36px;background:#1a1a1a;display:flex;align-items:center;justify-content:center;margin-right:16px;font-size:16px;flex-shrink:0;}
-.agent-section{margin:0 24px 48px;background:#111;border:1px solid #1a1a1a;padding:28px;}
-.agent-section h3{color:#666;font-size:10px;letter-spacing:3px;margin-bottom:20px;}
-.agent-name{font-size:18px;margin-bottom:16px;}
-.agent-btns{display:flex;gap:12px;flex-wrap:wrap;}
-a.agent-btn{flex:1;min-width:120px;padding:14px;border:1px solid #c9a84c;color:#c9a84c;text-align:center;text-decoration:none;font-size:11px;letter-spacing:2px;}
-a.agent-btn:hover{background:#c9a84c;color:#000;}
-.no-props,.loading{text-align:center;color:#444;padding:80px 32px;font-size:16px;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  :root{
+    --sand:#DFDACB;
+    --sand-light:#EDEAE0;
+    --sand-dark:#C8C3B0;
+    --charcoal:#282828;
+    --charcoal-mid:#3D3D3D;
+    --grey:#7A7A7A;
+    --grey-light:#A8A8A8;
+    --white:#FAFAF8;
+    --border:#C8C3B0;
+  }
+  body{
+    background:var(--sand);
+    color:var(--charcoal);
+    font-family:'Inter',sans-serif;
+    min-height:100vh;
+  }
+  /* HEADER */
+  header{
+    background:var(--charcoal);
+    padding:20px 40px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    position:sticky;
+    top:0;
+    z-index:100;
+  }
+  .header-brand{
+    font-family:'Cormorant Garamond',serif;
+    font-size:20px;
+    font-weight:400;
+    letter-spacing:5px;
+    text-transform:uppercase;
+    color:var(--sand);
+    text-decoration:none;
+  }
+  .header-right{
+    font-size:9px;
+    letter-spacing:2.5px;
+    text-transform:uppercase;
+    color:var(--grey);
+  }
+  /* HERO */
+  .hero{
+    background:var(--white);
+    border-bottom:1px solid var(--border);
+    padding:48px 40px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    flex-wrap:wrap;
+    gap:20px;
+  }
+  .hero-welcome{
+    font-size:10px;
+    letter-spacing:3px;
+    text-transform:uppercase;
+    color:var(--grey);
+    margin-bottom:8px;
+  }
+  .hero-name{
+    font-family:'Cormorant Garamond',serif;
+    font-size:36px;
+    font-weight:400;
+    color:var(--charcoal);
+    line-height:1.1;
+  }
+  .hero-tagline{
+    font-size:12px;
+    color:var(--grey);
+    margin-top:8px;
+    letter-spacing:0.3px;
+    line-height:1.6;
+  }
+  /* MAIN LAYOUT */
+  .main{
+    max-width:1200px;
+    margin:0 auto;
+    padding:48px 40px;
+  }
+  /* SECTION HEADINGS */
+  .section-label{
+    font-size:9px;
+    letter-spacing:3px;
+    text-transform:uppercase;
+    color:var(--grey);
+    margin-bottom:20px;
+    display:flex;
+    align-items:center;
+    gap:12px;
+  }
+  .section-label::after{
+    content:'';
+    flex:1;
+    height:1px;
+    background:var(--border);
+  }
+  /* PROPERTIES */
+  .properties-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(320px,1fr));
+    gap:24px;
+    margin-bottom:56px;
+  }
+  .property-card{
+    background:var(--white);
+    border:1px solid var(--border);
+    border-radius:4px;
+    overflow:hidden;
+    transition:box-shadow 0.2s;
+  }
+  .property-card:hover{box-shadow:0 4px 24px rgba(40,40,40,0.08);}
+  .property-thumb{
+    width:100%;
+    height:200px;
+    object-fit:cover;
+    background:var(--sand-dark);
+    display:block;
+  }
+  .property-thumb-placeholder{
+    width:100%;
+    height:200px;
+    background:var(--sand-dark);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .property-thumb-placeholder span{
+    font-size:9px;
+    letter-spacing:2px;
+    text-transform:uppercase;
+    color:var(--grey);
+  }
+  .property-body{padding:24px;}
+  .property-type{
+    font-size:8px;
+    letter-spacing:2.5px;
+    text-transform:uppercase;
+    color:var(--grey);
+    margin-bottom:6px;
+  }
+  .property-name{
+    font-family:'Cormorant Garamond',serif;
+    font-size:22px;
+    font-weight:400;
+    color:var(--charcoal);
+    margin-bottom:4px;
+  }
+  .property-address{
+    font-size:12px;
+    color:var(--grey);
+    margin-bottom:20px;
+    line-height:1.4;
+  }
+  .file-list{list-style:none;}
+  .file-item{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:10px 0;
+    border-top:1px solid var(--sand);
+    text-decoration:none;
+    color:var(--charcoal);
+    transition:color 0.2s;
+  }
+  .file-item:hover{color:var(--grey);}
+  .file-icon{
+    width:32px;
+    height:32px;
+    background:var(--sand);
+    border-radius:2px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-shrink:0;
+    font-size:8px;
+    letter-spacing:1px;
+    text-transform:uppercase;
+    color:var(--grey);
+    font-weight:500;
+  }
+  .file-icon.img{background:#E8E4DA;color:var(--grey);}
+  .file-name{font-size:13px;flex:1;}
+  .file-arrow{
+    font-size:14px;
+    color:var(--grey-light);
+    flex-shrink:0;
+  }
+  /* AGENT SECTION */
+  .agent-section{
+    background:var(--charcoal);
+    border-radius:4px;
+    padding:40px;
+    display:flex;
+    align-items:center;
+    gap:32px;
+    flex-wrap:wrap;
+    margin-top:0;
+  }
+  .agent-photo{
+    width:80px;
+    height:80px;
+    border-radius:50%;
+    object-fit:cover;
+    background:var(--charcoal-mid);
+    flex-shrink:0;
+  }
+  .agent-photo-placeholder{
+    width:80px;
+    height:80px;
+    border-radius:50%;
+    background:#3D3D3D;
+    flex-shrink:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .agent-photo-placeholder span{font-size:24px;color:var(--grey);}
+  .agent-info{flex:1;}
+  .agent-label{
+    font-size:8px;
+    letter-spacing:2.5px;
+    text-transform:uppercase;
+    color:var(--grey);
+    margin-bottom:6px;
+  }
+  .agent-name{
+    font-family:'Cormorant Garamond',serif;
+    font-size:26px;
+    font-weight:400;
+    color:var(--sand);
+    margin-bottom:4px;
+  }
+  .agent-title{
+    font-size:11px;
+    color:var(--grey);
+    letter-spacing:0.3px;
+    margin-bottom:16px;
+  }
+  .agent-actions{display:flex;gap:12px;flex-wrap:wrap;}
+  .agent-btn{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    padding:10px 20px;
+    border-radius:2px;
+    font-size:9px;
+    letter-spacing:2.5px;
+    text-transform:uppercase;
+    text-decoration:none;
+    font-weight:500;
+    font-family:'Inter',sans-serif;
+    transition:all 0.2s;
+    cursor:pointer;
+    border:none;
+  }
+  .agent-btn.primary{background:var(--sand);color:var(--charcoal);}
+  .agent-btn.primary:hover{background:var(--sand-dark);}
+  .agent-btn.secondary{background:transparent;color:var(--sand-dark);border:1px solid #3D3D3D;}
+  .agent-btn.secondary:hover{border-color:var(--sand-dark);}
+  /* EMPTY STATE */
+  .empty{
+    padding:60px 20px;
+    text-align:center;
+    color:var(--grey);
+  }
+  .empty-title{
+    font-family:'Cormorant Garamond',serif;
+    font-size:24px;
+    font-weight:400;
+    margin-bottom:8px;
+    color:var(--charcoal);
+  }
+  .empty-sub{font-size:12px;line-height:1.6;}
+  /* FOOTER */
+  footer{
+    border-top:1px solid var(--border);
+    padding:24px 40px;
+    text-align:center;
+    font-size:9px;
+    letter-spacing:2px;
+    text-transform:uppercase;
+    color:var(--grey-light);
+    margin-top:64px;
+  }
+  /* LOADING */
+  .loading{
+    min-height:60vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .loading-dot{
+    width:6px;height:6px;border-radius:50%;background:var(--sand-dark);
+    display:inline-block;margin:0 3px;
+    animation:pulse 1.4s ease-in-out infinite;
+  }
+  .loading-dot:nth-child(2){animation-delay:0.2s;}
+  .loading-dot:nth-child(3){animation-delay:0.4s;}
+  @keyframes pulse{0%,100%{opacity:0.3;transform:scale(0.8);}50%{opacity:1;transform:scale(1);}}
+  /* ERROR */
+  .error-state{
+    min-height:60vh;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    padding:40px;
+  }
+  .error-code{
+    font-family:'Cormorant Garamond',serif;
+    font-size:64px;
+    font-weight:300;
+    color:var(--sand-dark);
+    line-height:1;
+    margin-bottom:12px;
+  }
+  .error-msg{font-size:13px;color:var(--grey);margin-bottom:24px;}
+  .btn-outline{
+    display:inline-flex;
+    padding:12px 28px;
+    border:1px solid var(--border);
+    border-radius:2px;
+    font-size:9px;
+    letter-spacing:2.5px;
+    text-transform:uppercase;
+    color:var(--charcoal);
+    text-decoration:none;
+    transition:all 0.2s;
+  }
+  .btn-outline:hover{background:var(--charcoal);color:var(--sand);}
+  @media(max-width:640px){
+    header{padding:16px 20px;}
+    .hero{padding:32px 20px;}
+    .hero-name{font-size:28px;}
+    .main{padding:32px 20px;}
+    .agent-section{padding:28px 20px;}
+  }
 </style>
 </head>
 <body>
 <header>
-  <h1>NALU BY MONACO</h1>
-  <span id="buyer-email"></span>
+  <a class="header-brand" href="#">Nalu by Monaco</a>
+  <span class="header-right" id="buyerNameHeader"></span>
 </header>
-<p id="greeting" class="greeting"></p>
-<hr>
-<div id="container"><div class="loading">Loading your properties...</div></div>
+
+<div id="loadingState" class="loading">
+  <span class="loading-dot"></span>
+  <span class="loading-dot"></span>
+  <span class="loading-dot"></span>
+</div>
+
+<div id="errorState" class="error-state" style="display:none">
+  <div class="error-code">!</div>
+  <div class="error-msg" id="errorMsg">Your access link is invalid or has expired.</div>
+  <a href="/login" class="btn-outline">Request New Link</a>
+</div>
+
+<div id="portalContent" style="display:none">
+  <div class="hero">
+    <div>
+      <div class="hero-welcome">Your Private Portal</div>
+      <div class="hero-name" id="heroName">Welcome</div>
+      <div class="hero-tagline">Your curated collection of properties and documents, exclusively prepared for you.</div>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="section-label">Your Properties</div>
+    <div class="properties-grid" id="propertiesGrid">
+      <!-- properties injected here -->
+    </div>
+
+    <div class="section-label">Your Agent</div>
+    <div class="agent-section" id="agentSection">
+      <!-- agent injected here -->
+    </div>
+  </div>
+
+  <footer>buyers.nalubymonaco.com.au &nbsp;&mdash;&nbsp; Private &amp; Confidential</footer>
+</div>
+
 <script>
-const token = location.pathname.split('/portal/')[1];
-  (async()=>{
-    try{
-      if(!token){document.getElementById('greeting').innerHTML='Hi <strong>there</strong>, welcome to the portal';document.getElementById('container').innerHTML='<div class="no-props">No properties assigned yet. Your agent will update this shortly.</div>';return;}
-      const r=await fetch('/api/portal/'+token);
-    if(!r.ok){document.getElementById('container').innerHTML='<div class="no-props">Portal not found.</div>';return;}
-    const{buyer,properties:props}=await r.json();
-    document.getElementById('buyer-email').textContent=buyer.email;
-    document.getElementById('greeting').innerHTML='Hi <strong>'+buyer.name.split(' ')[0]+'</strong>, welcome back';
-    if(!props||!props.length){document.getElementById('container').innerHTML='<div class="no-props">No properties assigned yet. Your agent will update this shortly.</div>';return;}
-    let html='';
-    props.forEach(prop=>{
-      const imgs=prop.files.filter(f=>f.type==='image');
-      const docs=prop.files.filter(f=>f.type==='document');
-      const files=[...imgs,...docs];
-      const filesHtml=files.length?files.map(f=>'<a class="file-item" href="'+f.url+'" target="_blank"><div class="file-icon">'+(f.type==='image'?'📷':'📄')+'</div>'+f.name+'</a>').join(''):'<p style="color:#444;font-size:13px;">No documents yet.</p>';
-      html+='<div class="property-card"><div class="property-header"><h2>'+prop.name+'</h2><div class="address">'+prop.address.toUpperCase()+'</div></div>';
-      if(prop.price||prop.availability){html+='<div class="property-meta">';if(prop.price)html+='<div class="meta-item"><label>PRICE</label><span>'+prop.price+'</span></div>';if(prop.availability)html+='<div class="meta-item"><label>AVAILABILITY</label><span>'+prop.availability+'</span></div>';html+='</div>';}
-      html+='<div class="docs-section"><h3>DOCUMENTS &amp; MEDIA</h3>'+filesHtml+'</div></div>';
-      if(prop.agent_name){
-        const phone=prop.agent_phone?'<a class="agent-btn" href="tel:'+prop.agent_phone+'">📞 CALL</a>':'';
-        const wa=prop.agent_whatsapp?'<a class="agent-btn" href="https://wa.me/'+prop.agent_whatsapp.replace(/[^0-9]/g,'')+'" target="_blank">💬 WHATSAPP</a>':'';
-        html+='<div class="agent-section"><h3>NEED ASSISTANCE?</h3><div class="agent-name">'+prop.agent_name+'</div><div class="agent-btns">'+phone+wa+'</div></div>';
-      }
-    });
-    document.getElementById('container').innerHTML=html;
-  }catch(e){document.getElementById('container').innerHTML='<div class="no-props">Error loading portal. Please refresh.</div>';}
+(async function(){
+  const token = window.location.pathname.split('/').filter(Boolean)[1] || '';
+  const loadEl = document.getElementById('loadingState');
+  const errEl = document.getElementById('errorState');
+  const portalEl = document.getElementById('portalContent');
+  const errMsg = document.getElementById('errorMsg');
+
+  if(!token){
+    loadEl.style.display='none';
+    errEl.style.display='flex';
+    errMsg.textContent='No access token provided. Please use the link sent to your email.';
+    return;
+  }
+
+  try{
+    const res = await fetch('/api/portal/' + token);
+    const data = await res.json();
+
+    if(!res.ok){
+      loadEl.style.display='none';
+      errEl.style.display='flex';
+      errMsg.textContent = data.error || 'Access denied. Please request a new access link.';
+      return;
+    }
+
+    // Populate buyer name
+    document.getElementById('heroName').textContent = 'Welcome, ' + data.buyer.name.split(' ')[0];
+    document.getElementById('buyerNameHeader').textContent = data.buyer.name;
+
+    // Populate properties
+    const grid = document.getElementById('propertiesGrid');
+    if(!data.properties || data.properties.length === 0){
+      grid.innerHTML = '<div class="empty"><div class="empty-title">No Properties Yet</div><div class="empty-sub">Your agent will add properties shortly.</div></div>';
+    } else {
+      grid.innerHTML = data.properties.map(p => {
+        const files = (p.files||[]).map(f => {
+          const ext = f.name ? f.name.split('.').pop().toUpperCase() : 'FILE';
+          const isImg = ['JPG','JPEG','PNG','WEBP','GIF'].includes(ext);
+          const iconClass = isImg ? 'file-icon img' : 'file-icon';
+          const iconLabel = isImg ? 'IMG' : ext;
+          return `<a class="file-item" href="${f.url||f.file_url||'#'}" target="_blank" rel="noopener">
+            <span class="${iconClass}">${iconLabel}</span>
+            <span class="file-name">${f.name||f.file_name||'Document'}</span>
+            <span class="file-arrow">&#8599;</span>
+          </a>`;
+        }).join('');
+
+        const thumb = p.thumbnail_url
+          ? `<img class="property-thumb" src="${p.thumbnail_url}" alt="${p.name}" loading="lazy">`
+          : `<div class="property-thumb-placeholder"><span>No Image</span></div>`;
+
+        return `<div class="property-card">
+          ${thumb}
+          <div class="property-body">
+            <div class="property-type">${p.type||'Residential'}</div>
+            <div class="property-name">${p.name||'Property'}</div>
+            <div class="property-address">${p.address||''}</div>
+            ${files ? `<ul class="file-list">${files}</ul>` : '<div style="font-size:12px;color:var(--grey-light);padding-top:8px;">No documents yet</div>'}
+          </div>
+        </div>`;
+      }).join('');
+    }
+
+    // Populate agent
+    const agentEl = document.getElementById('agentSection');
+    const agent = data.agent || {};
+    const initials = (agent.name||'Agent').split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
+    const photoHtml = agent.photo_url
+      ? `<img class="agent-photo" src="${agent.photo_url}" alt="${agent.name}">`
+      : `<div class="agent-photo-placeholder"><span>${initials}</span></div>`;
+
+    const phoneLink = agent.phone ? `<a href="tel:${agent.phone}" class="agent-btn secondary">Call</a>` : '';
+    const whatsappLink = agent.whatsapp ? `<a href="https://wa.me/${agent.whatsapp.replace(/\D/g,'')}" target="_blank" class="agent-btn primary">WhatsApp</a>` : '';
+    const emailLink = agent.email ? `<a href="mailto:${agent.email}" class="agent-btn secondary">Email</a>` : '';
+
+    agentEl.innerHTML = `
+      ${photoHtml}
+      <div class="agent-info">
+        <div class="agent-label">Your Agent</div>
+        <div class="agent-name">${agent.name||'Your Agent'}</div>
+        <div class="agent-title">${agent.title||'Sales Agent'} &mdash; Nalu by Monaco</div>
+        <div class="agent-actions">${whatsappLink}${phoneLink}${emailLink}</div>
+      </div>
+    `;
+
+    loadEl.style.display='none';
+    portalEl.style.display='block';
+
+  } catch(err) {
+    loadEl.style.display='none';
+    errEl.style.display='flex';
+    errMsg.textContent='Unable to load your portal. Please try again.';
+  }
 })();
 </script>
 </body>
