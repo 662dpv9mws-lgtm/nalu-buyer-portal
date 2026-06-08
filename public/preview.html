@@ -29,8 +29,7 @@
     .section-title{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:300;color:var(--charcoal);margin-bottom:40px;line-height:1.2;}
     .properties-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:24px;margin-bottom:60px;}
     .property-card{background:var(--white);border:1px solid var(--border);overflow:hidden;}
-    .property-render{width:100%;height:220px;background:var(--sand-light);display:flex;align-items:center;justify-content:center;color:var(--grey);font-size:11px;letter-spacing:2px;text-transform:uppercase;position:relative;}
-    .property-render img{width:100%;height:100%;object-fit:cover;}
+    .property-render{width:100%;height:220px;background:var(--sand-light);display:flex;align-items:center;justify-content:center;color:var(--grey);font-size:11px;letter-spacing:2px;text-transform:uppercase;}
     .property-body{padding:24px;}
     .property-type{font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--grey);margin-bottom:6px;}
     .property-name{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:400;color:var(--charcoal);margin-bottom:4px;}
@@ -48,14 +47,14 @@
     .file-name{flex:1;font-size:12px;color:var(--charcoal);}
     .file-link{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--grey);text-decoration:none;border-bottom:1px solid var(--border);padding-bottom:1px;}
     .file-link:hover{color:var(--charcoal);border-color:var(--charcoal);}
-    .agent-card{background:var(--white);border:1px solid var(--border);padding:32px;display:flex;align-items:center;gap:28px;margin-top:20px;}
-    .agent-photo{width:72px;height:72px;border-radius:50%;background:var(--sand-light);display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--grey);flex-shrink:0;overflow:hidden;}
-    .agent-photo img{width:100%;height:100%;object-fit:cover;border-radius:50%;}
+    .agents-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(460px,1fr));gap:20px;margin-top:20px;}
+    .agent-card{background:var(--white);border:1px solid var(--border);padding:32px;display:flex;align-items:center;gap:28px;}
+    .agent-photo{width:72px;height:72px;border-radius:50%;background:var(--sand-light);display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--grey);flex-shrink:0;}
     .agent-label{font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--grey);margin-bottom:4px;}
     .agent-name{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:400;color:var(--charcoal);margin-bottom:2px;}
     .agent-title{font-size:12px;color:var(--grey);margin-bottom:16px;}
-    .agent-actions{display:flex;gap:12px;flex-wrap:wrap;}
-    .agent-btn{padding:9px 20px;font-size:10px;letter-spacing:2px;text-transform:uppercase;font-family:'Inter',sans-serif;cursor:pointer;text-decoration:none;display:inline-block;}
+    .agent-actions{display:flex;gap:10px;flex-wrap:wrap;}
+    .agent-btn{padding:9px 18px;font-size:10px;letter-spacing:2px;text-transform:uppercase;font-family:'Inter',sans-serif;cursor:pointer;text-decoration:none;display:inline-block;}
     .agent-btn.primary{background:var(--charcoal);color:var(--white);border:1px solid var(--charcoal);}
     .agent-btn.secondary{background:transparent;color:var(--charcoal);border:1px solid var(--border);}
     .agent-btn:hover{opacity:0.8;}
@@ -78,9 +77,7 @@
     <div class="properties-grid">
 
       <div class="property-card">
-        <div class="property-render">
-          <span>Residence Render</span>
-        </div>
+        <div class="property-render">Residence Render</div>
         <div class="property-body">
           <div class="property-type">Beachfront Residence</div>
           <div class="property-name">Residence 03 &mdash; Level 4</div>
@@ -94,23 +91,17 @@
           <div class="files-section">
             <div class="files-label">Documents</div>
             <div class="file-item">
-              <div class="file-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-              </div>
+              <div class="file-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
               <div class="file-name">Floor Plan &mdash; Level 4</div>
               <a href="#" class="file-link">View</a>
             </div>
             <div class="file-item">
-              <div class="file-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-              </div>
+              <div class="file-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
               <div class="file-name">Contract of Sale</div>
               <a href="#" class="file-link">View</a>
             </div>
             <div class="file-item">
-              <div class="file-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-              </div>
+              <div class="file-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>
               <div class="file-name">3D Renders &amp; Interiors</div>
               <a href="#" class="file-link">View</a>
             </div>
@@ -119,9 +110,7 @@
       </div>
 
       <div class="property-card">
-        <div class="property-render">
-          <span>Residence Render</span>
-        </div>
+        <div class="property-render">Residence Render</div>
         <div class="property-body">
           <div class="property-type">Penthouse</div>
           <div class="property-name">Penthouse 01 &mdash; Level 12</div>
@@ -135,16 +124,12 @@
           <div class="files-section">
             <div class="files-label">Documents</div>
             <div class="file-item">
-              <div class="file-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-              </div>
+              <div class="file-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
               <div class="file-name">Penthouse Floor Plan</div>
               <a href="#" class="file-link">View</a>
             </div>
             <div class="file-item">
-              <div class="file-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-              </div>
+              <div class="file-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
               <div class="file-name">Information Memorandum</div>
               <a href="#" class="file-link">View</a>
             </div>
@@ -154,19 +139,37 @@
 
     </div>
 
-    <div class="section-label">Your Agent</div>
-    <div class="agent-card">
-      <div class="agent-photo">JD</div>
-      <div class="agent-info">
-        <div class="agent-label">Your Agent</div>
-        <div class="agent-name">James Davidson</div>
-        <div class="agent-title">Sales Agent &mdash; Nalu by Monaco</div>
-        <div class="agent-actions">
-          <a href="https://wa.me/61400000000" target="_blank" class="agent-btn primary">WhatsApp</a>
-          <a href="tel:+61400000000" class="agent-btn secondary">Call</a>
-          <a href="mailto:james@nalubymonaco.com.au" class="agent-btn secondary">Email</a>
+    <div class="section-label">Your Agents</div>
+    <div class="agents-grid">
+
+      <div class="agent-card">
+        <div class="agent-photo">MK</div>
+        <div class="agent-info">
+          <div class="agent-label">Your Agent</div>
+          <div class="agent-name">Michael Kollosche</div>
+          <div class="agent-title">Principal &mdash; Nalu by Monaco</div>
+          <div class="agent-actions">
+            <a href="https://wa.me/61411188815" target="_blank" class="agent-btn primary">WhatsApp</a>
+            <a href="tel:+61411188815" class="agent-btn secondary">Call</a>
+            <a href="mailto:michael@kollosche.com.au" class="agent-btn secondary">Email</a>
+          </div>
         </div>
       </div>
+
+      <div class="agent-card">
+        <div class="agent-photo">JD</div>
+        <div class="agent-info">
+          <div class="agent-label">Your Agent</div>
+          <div class="agent-name">James Davidson</div>
+          <div class="agent-title">Sales Agent &mdash; Nalu by Monaco</div>
+          <div class="agent-actions">
+            <a href="https://wa.me/61400000000" target="_blank" class="agent-btn primary">WhatsApp</a>
+            <a href="tel:+61400000000" class="agent-btn secondary">Call</a>
+            <a href="mailto:james@nalubymonaco.com.au" class="agent-btn secondary">Email</a>
+          </div>
+        </div>
+      </div>
+
     </div>
   </div>
   <footer>
