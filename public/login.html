@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Buyer Portal | Nalu by Monaco</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:#0a0a0a;color:#fff;font-family:Georgia,serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+  .logo{text-align:center;margin-bottom:48px;}
+  .logo h1{color:#c9a84c;letter-spacing:6px;font-size:32px;font-weight:normal;}
+  .logo p{color:#666;letter-spacing:3px;font-size:11px;margin-top:6px;}
+  .card{background:#111;border:1px solid #222;padding:48px 40px;width:100%;max-width:420px;}
+  label{display:block;color:#888;font-size:11px;letter-spacing:2px;margin-bottom:8px;}
+  input{width:100%;background:#0a0a0a;border:1px solid #333;color:#fff;padding:14px 16px;font-size:14px;outline:none;margin-bottom:24px;font-family:Georgia,serif;}
+  input:focus{border-color:#c9a84c;}
+  button{width:100%;background:#c9a84c;color:#0a0a0a;border:none;padding:16px;font-size:13px;letter-spacing:3px;cursor:pointer;font-weight:bold;font-family:Georgia,serif;}
+  button:hover{background:#b8963e;}
+  .msg{margin-top:20px;padding:14px;font-size:13px;text-align:center;}
+  .msg.success{background:#0d2b1a;border:1px solid #1a5c36;color:#4caf82;}
+  .msg.error{background:#2b0d0d;border:1px solid #5c1a1a;color:#f47878;}
+  .footer{margin-top:48px;color:#333;font-size:11px;letter-spacing:1px;}
+</style>
+</head>
+<body>
+<div class="logo">
+  <h1>NALU BY MONACO</h1>
+  <p>BUYER PORTAL</p>
+</div>
+<div class="card">
+  <div id="form-view">
+    <label for="email">YOUR EMAIL ADDRESS</label>
+    <input type="email" id="email" placeholder="you@example.com" autocomplete="email">
+    <button id="submit-btn" onclick="requestLink()">SEND MY ACCESS LINK</button>
+    <div id="message"></div>
+  </div>
+</div>
+<p class="footer">buyers.nalubymonaco.com.au</p>
+<script>
+const params = new URLSearchParams(location.search);
+if (params.get('error') === 'expired') {
+  document.getElementById('message').innerHTML = '<div class="msg error">That link has expired. Please request a new one.</div>';
+}
+
+async function requestLink() {
+  const email = document.getElementById('email').value.trim();
+  if (!email) { showMsg('Please enter your email address.', 'error'); return; }
+  const btn = document.getElementById('submit-btn');
+  btn.textContent = 'SENDING...';
+  btn.disabled = true;
+  try {
+    const r = await fetch('/api/request-link', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ email }) });
+    const d = await r.json();
+    if (d.success) {
+      showMsg('Check your email! We have sent you a secure access link. It expires in 15 minutes.', 'success');
+      document.getElementById('form-view').querySelector('input').disabled = true;
+    } else {
+      showMsg(d.error || 'Something went wrong.', 'error');
+    }
+  } catch(e) {
+    showMsg('Network error. Please try again.', 'error');
+  }
+  btn.textContent = 'SEND MY ACCESS LINK';
+  btn.disabled = false;
+}
+
+function showMsg(msg, type) {
+  document.getElementById('message').innerHTML = '<div class="msg ' + type + '">' + msg + '</div>';
+}
+
+document.getElementById('email').addEventListener('keydown', e => { if(e.key==='Enter') requestLink(); });
+</script>
+</body>
+</html>
