@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Properties | Nalu by Monaco</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:#0a0a0a;color:#fff;font-family:Georgia,serif;min-height:100vh;}
+header{padding:24px 32px;border-bottom:1px solid #1a1a1a;display:flex;justify-content:space-between;align-items:center;}
+header h1{color:#c9a84c;letter-spacing:5px;font-size:22px;font-weight:normal;}
+header span{color:#555;font-size:12px;letter-spacing:2px;}
+.greeting{padding:40px 32px 8px;font-size:24px;}
+.greeting strong{color:#c9a84c;}
+hr{border:none;border-top:1px solid #1a1a1a;margin:0 32px 32px;}
+.property-card{margin:0 24px 32px;background:#111;border:1px solid #1a1a1a;}
+.property-header{padding:28px 28px 20px;border-bottom:1px solid #1a1a1a;}
+.property-header h2{font-size:22px;font-weight:normal;margin-bottom:6px;}
+.address{color:#666;font-size:12px;letter-spacing:1px;}
+.property-meta{padding:20px 28px;display:grid;grid-template-columns:1fr 1fr;gap:16px;border-bottom:1px solid #1a1a1a;}
+.meta-item label{display:block;color:#666;font-size:10px;letter-spacing:2px;margin-bottom:6px;}
+.meta-item span{color:#c9a84c;font-size:18px;}
+.docs-section{padding:20px 28px;}
+.docs-section h3{color:#666;font-size:10px;letter-spacing:3px;margin-bottom:16px;}
+a.file-item{display:flex;align-items:center;background:#0d0d0d;border:1px solid #1a1a1a;padding:16px 20px;margin-bottom:8px;cursor:pointer;text-decoration:none;color:#fff;transition:border-color 0.2s;}
+a.file-item:hover{border-color:#c9a84c;}
+.file-icon{width:36px;height:36px;background:#1a1a1a;display:flex;align-items:center;justify-content:center;margin-right:16px;font-size:16px;flex-shrink:0;}
+.agent-section{margin:0 24px 48px;background:#111;border:1px solid #1a1a1a;padding:28px;}
+.agent-section h3{color:#666;font-size:10px;letter-spacing:3px;margin-bottom:20px;}
+.agent-name{font-size:18px;margin-bottom:16px;}
+.agent-btns{display:flex;gap:12px;flex-wrap:wrap;}
+a.agent-btn{flex:1;min-width:120px;padding:14px;border:1px solid #c9a84c;color:#c9a84c;text-align:center;text-decoration:none;font-size:11px;letter-spacing:2px;}
+a.agent-btn:hover{background:#c9a84c;color:#000;}
+.no-props,.loading{text-align:center;color:#444;padding:80px 32px;font-size:16px;}
+</style>
+</head>
+<body>
+<header>
+  <h1>NALU BY MONACO</h1>
+  <span id="buyer-email"></span>
+</header>
+<p id="greeting" class="greeting"></p>
+<hr>
+<div id="container"><div class="loading">Loading your properties...</div></div>
+<script>
+const token = location.pathname.split('/portal/')[1];
+(async()=>{
+  try{
+    const r=await fetch('/api/portal/'+token);
+    if(!r.ok){document.getElementById('container').innerHTML='<div class="no-props">Portal not found.</div>';return;}
+    const{buyer,properties:props}=await r.json();
+    document.getElementById('buyer-email').textContent=buyer.email;
+    document.getElementById('greeting').innerHTML='Hi <strong>'+buyer.name.split(' ')[0]+'</strong>, welcome back';
+    if(!props||!props.length){document.getElementById('container').innerHTML='<div class="no-props">No properties assigned yet. Your agent will update this shortly.</div>';return;}
+    let html='';
+    props.forEach(prop=>{
+      const imgs=prop.files.filter(f=>f.type==='image');
+      const docs=prop.files.filter(f=>f.type==='document');
+      const files=[...imgs,...docs];
+      const filesHtml=files.length?files.map(f=>'<a class="file-item" href="'+f.url+'" target="_blank"><div class="file-icon">'+(f.type==='image'?'📷':'📄')+'</div>'+f.name+'</a>').join(''):'<p style="color:#444;font-size:13px;">No documents yet.</p>';
+      html+='<div class="property-card"><div class="property-header"><h2>'+prop.name+'</h2><div class="address">'+prop.address.toUpperCase()+'</div></div>';
+      if(prop.price||prop.availability){html+='<div class="property-meta">';if(prop.price)html+='<div class="meta-item"><label>PRICE</label><span>'+prop.price+'</span></div>';if(prop.availability)html+='<div class="meta-item"><label>AVAILABILITY</label><span>'+prop.availability+'</span></div>';html+='</div>';}
+      html+='<div class="docs-section"><h3>DOCUMENTS &amp; MEDIA</h3>'+filesHtml+'</div></div>';
+      if(prop.agent_name){
+        const phone=prop.agent_phone?'<a class="agent-btn" href="tel:'+prop.agent_phone+'">📞 CALL</a>':'';
+        const wa=prop.agent_whatsapp?'<a class="agent-btn" href="https://wa.me/'+prop.agent_whatsapp.replace(/[^0-9]/g,'')+'" target="_blank">💬 WHATSAPP</a>':'';
+        html+='<div class="agent-section"><h3>NEED ASSISTANCE?</h3><div class="agent-name">'+prop.agent_name+'</div><div class="agent-btns">'+phone+wa+'</div></div>';
+      }
+    });
+    document.getElementById('container').innerHTML=html;
+  }catch(e){document.getElementById('container').innerHTML='<div class="no-props">Error loading portal. Please refresh.</div>';}
+})();
+</script>
+</body>
+</html>
