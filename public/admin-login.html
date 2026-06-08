@@ -4,44 +4,168 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Admin Login | Nalu by Monaco</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
-*{margin:0;padding:0;box-sizing:border-box;}
-body{background:#0a0a0a;color:#fff;font-family:Georgia,serif;min-height:100vh;display:flex;align-items:center;justify-content:center;}
-.card{background:#111;border:1px solid #222;padding:48px 40px;width:100%;max-width:400px;text-align:center;}
-h1{color:#c9a84c;letter-spacing:5px;font-size:26px;font-weight:normal;margin-bottom:8px;}
-.sub{color:#555;font-size:11px;letter-spacing:2px;margin-bottom:40px;}
-label{display:block;text-align:left;color:#666;font-size:10px;letter-spacing:2px;margin-bottom:8px;}
-input{width:100%;background:#0a0a0a;border:1px solid #333;color:#fff;padding:14px 16px;font-size:14px;outline:none;margin-bottom:20px;font-family:Georgia,serif;}
-input:focus{border-color:#c9a84c;}
-button{width:100%;background:#c9a84c;color:#0a0a0a;border:none;padding:16px;font-size:12px;letter-spacing:3px;cursor:pointer;font-weight:bold;font-family:Georgia,serif;}
-button:hover{background:#b8963e;}
-.err{margin-top:16px;padding:12px;background:#2b0d0d;border:1px solid #5c1a1a;color:#f47878;font-size:13px;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  :root{
+    --sand:#DFDACB;
+    --sand-light:#EDEAE0;
+    --sand-dark:#C8C3B0;
+    --charcoal:#282828;
+    --charcoal-mid:#3D3D3D;
+    --grey:#7A7A7A;
+    --grey-light:#A8A8A8;
+    --white:#FAFAF8;
+    --border:#C8C3B0;
+  }
+  body{
+    background:var(--charcoal);
+    color:var(--sand);
+    font-family:'Inter',sans-serif;
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    padding:24px;
+  }
+  .wrap{width:100%;max-width:380px;display:flex;flex-direction:column;align-items:center;}
+  .logo{text-align:center;margin-bottom:48px;}
+  .logo-wordmark{
+    font-family:'Cormorant Garamond',serif;
+    font-size:24px;
+    font-weight:400;
+    letter-spacing:8px;
+    text-transform:uppercase;
+    color:var(--sand);
+    line-height:1;
+  }
+  .logo-sub{
+    font-size:8px;
+    letter-spacing:3.5px;
+    text-transform:uppercase;
+    color:var(--grey);
+    font-weight:400;
+    margin-top:10px;
+  }
+  .divider{width:32px;height:1px;background:#3D3D3D;margin:14px auto;}
+  .card{
+    background:#1E1E1E;
+    border:1px solid #333;
+    border-radius:4px;
+    padding:40px 36px;
+    width:100%;
+  }
+  .card-title{
+    font-family:'Cormorant Garamond',serif;
+    font-size:16px;
+    font-weight:400;
+    letter-spacing:3px;
+    text-transform:uppercase;
+    color:var(--sand-dark);
+    text-align:center;
+    margin-bottom:28px;
+  }
+  label{
+    display:block;
+    font-size:9px;
+    letter-spacing:2.5px;
+    text-transform:uppercase;
+    color:var(--grey);
+    margin-bottom:8px;
+    font-weight:500;
+  }
+  input{
+    width:100%;
+    background:#282828;
+    border:1px solid #3D3D3D;
+    border-radius:2px;
+    color:var(--sand-light);
+    padding:13px 16px;
+    font-size:14px;
+    outline:none;
+    margin-bottom:20px;
+    font-family:'Inter',sans-serif;
+    transition:border-color 0.2s;
+  }
+  input::placeholder{color:#4A4A4A;}
+  input:focus{border-color:var(--sand-dark);}
+  button{
+    width:100%;
+    background:var(--sand);
+    color:var(--charcoal);
+    border:none;
+    border-radius:2px;
+    padding:15px 16px;
+    font-size:10px;
+    letter-spacing:3px;
+    text-transform:uppercase;
+    cursor:pointer;
+    font-weight:500;
+    font-family:'Inter',sans-serif;
+    transition:background 0.2s;
+    margin-top:4px;
+  }
+  button:hover{background:var(--sand-dark);}
+  .msg{margin-top:16px;padding:12px 16px;font-size:12px;text-align:center;border-radius:2px;letter-spacing:0.3px;}
+  .msg.error{background:#2D1A1A;border:1px solid #5A2D2D;color:#C47A7A;}
+  .footer{margin-top:40px;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#3D3D3D;text-align:center;}
 </style>
 </head>
 <body>
-<div class="card">
-  <h1>NALU BY MONACO</h1>
-  <p class="sub">ADMIN PORTAL</p>
-  <label>USERNAME</label>
-  <input type="text" id="u" autocomplete="username">
-  <label>PASSWORD</label>
-  <input type="password" id="p" autocomplete="current-password">
-  <button onclick="login()">LOGIN</button>
-  <div id="err"></div>
+<div class="wrap">
+  <div class="logo">
+    <div class="logo-wordmark">Nalu by Monaco</div>
+    <div class="divider"></div>
+    <div class="logo-sub">Admin Portal</div>
+  </div>
+  <div class="card">
+    <div class="card-title">Administrator Access</div>
+    <form id="adminLoginForm">
+      <label for="username">Username</label>
+      <input type="text" id="username" name="username" placeholder="username" required autocomplete="username">
+      <label for="password">Password</label>
+      <input type="password" id="password" name="password" placeholder="••••••••" required autocomplete="current-password">
+      <button type="submit" id="btn">Sign In</button>
+    </form>
+    <div id="msg"></div>
+  </div>
+  <div class="footer">buyers.nalubymonaco.com.au</div>
 </div>
 <script>
-async function login(){
-  const u=document.getElementById('u').value,p=document.getElementById('p').value;
-  if(!u||!p){show('Please enter username and password.');return;}
+document.getElementById('adminLoginForm').addEventListener('submit',async function(e){
+  e.preventDefault();
+  const username=document.getElementById('username').value;
+  const password=document.getElementById('password').value;
+  const btn=document.getElementById('btn');
+  const msg=document.getElementById('msg');
+  btn.textContent='Signing in...';
+  btn.disabled=true;
+  msg.innerHTML='';
   try{
-    const r=await fetch('/api/admin/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:u,password:p})});
+    const r=await fetch('/api/admin/login',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({username,password})
+    });
     const d=await r.json();
-    if(d.success)window.location.href='/admin';
-    else show(d.error||'Login failed.');
-  }catch(e){show('Network error.');}
-}
-function show(m){document.getElementById('err').innerHTML='<div class="err">'+m+'</div>';}
-document.addEventListener('keydown',e=>{if(e.key==='Enter')login();});
+    if(r.ok){
+      window.location.href='/admin';
+    } else {
+      msg.className='msg error';
+      msg.textContent=d.error||'Invalid credentials. Please try again.';
+      btn.textContent='Sign In';
+      btn.disabled=false;
+    }
+  }catch(err){
+    msg.className='msg error';
+    msg.textContent='An error occurred. Please try again.';
+    btn.textContent='Sign In';
+    btn.disabled=false;
+  }
+});
 </script>
 </body>
 </html>
