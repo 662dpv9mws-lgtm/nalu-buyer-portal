@@ -4,71 +4,191 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Buyer Portal | Nalu by Monaco</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
   *{margin:0;padding:0;box-sizing:border-box;}
-  body{background:#0a0a0a;color:#fff;font-family:Georgia,serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;}
-  .logo{text-align:center;margin-bottom:48px;}
-  .logo h1{color:#c9a84c;letter-spacing:6px;font-size:32px;font-weight:normal;}
-  .logo p{color:#666;letter-spacing:3px;font-size:11px;margin-top:6px;}
-  .card{background:#111;border:1px solid #222;padding:48px 40px;width:100%;max-width:420px;}
-  label{display:block;color:#888;font-size:11px;letter-spacing:2px;margin-bottom:8px;}
-  input{width:100%;background:#0a0a0a;border:1px solid #333;color:#fff;padding:14px 16px;font-size:14px;outline:none;margin-bottom:24px;font-family:Georgia,serif;}
-  input:focus{border-color:#c9a84c;}
-  button{width:100%;background:#c9a84c;color:#0a0a0a;border:none;padding:16px;font-size:13px;letter-spacing:3px;cursor:pointer;font-weight:bold;font-family:Georgia,serif;}
-  button:hover{background:#b8963e;}
-  .msg{margin-top:20px;padding:14px;font-size:13px;text-align:center;}
-  .msg.success{background:#0d2b1a;border:1px solid #1a5c36;color:#4caf82;}
-  .msg.error{background:#2b0d0d;border:1px solid #5c1a1a;color:#f47878;}
-  .footer{margin-top:48px;color:#333;font-size:11px;letter-spacing:1px;}
+  :root{
+    --sand:#DFDACB;
+    --sand-light:#EDEAE0;
+    --sand-dark:#C8C3B0;
+    --charcoal:#282828;
+    --charcoal-mid:#3D3D3D;
+    --grey:#7A7A7A;
+    --grey-light:#A8A8A8;
+    --white:#FAFAF8;
+    --border:#C8C3B0;
+  }
+  body{
+    background:var(--sand);
+    color:var(--charcoal);
+    font-family:'Inter',sans-serif;
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    padding:24px;
+  }
+  .wrap{
+    width:100%;
+    max-width:400px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+  }
+  .logo{
+    text-align:center;
+    margin-bottom:48px;
+  }
+  .logo-wordmark{
+    font-family:'Cormorant Garamond',serif;
+    font-size:28px;
+    font-weight:400;
+    letter-spacing:8px;
+    text-transform:uppercase;
+    color:var(--charcoal);
+    line-height:1;
+  }
+  .logo-sub{
+    font-size:9px;
+    letter-spacing:4px;
+    text-transform:uppercase;
+    color:var(--grey);
+    font-weight:400;
+    margin-top:10px;
+    font-family:'Inter',sans-serif;
+  }
+  .divider{
+    width:40px;
+    height:1px;
+    background:var(--sand-dark);
+    margin:16px auto;
+  }
+  .card{
+    background:var(--white);
+    border:1px solid var(--border);
+    border-radius:4px;
+    padding:40px 36px;
+    width:100%;
+  }
+  .card-title{
+    font-family:'Cormorant Garamond',serif;
+    font-size:18px;
+    font-weight:400;
+    letter-spacing:3px;
+    text-transform:uppercase;
+    color:var(--charcoal);
+    text-align:center;
+    margin-bottom:6px;
+  }
+  .card-desc{
+    font-size:12px;
+    color:var(--grey);
+    text-align:center;
+    line-height:1.6;
+    letter-spacing:0.3px;
+    margin-bottom:28px;
+  }
+  label{
+    display:block;
+    font-size:9px;
+    letter-spacing:2.5px;
+    text-transform:uppercase;
+    color:var(--grey);
+    margin-bottom:8px;
+    font-weight:500;
+  }
+  input[type=email]{
+    width:100%;
+    background:var(--sand-light);
+    border:1px solid var(--border);
+    border-radius:2px;
+    color:var(--charcoal);
+    padding:13px 16px;
+    font-size:14px;
+    outline:none;
+    margin-bottom:20px;
+    font-family:'Inter',sans-serif;
+    transition:border-color 0.2s;
+  }
+  input[type=email]::placeholder{color:var(--grey-light);}
+  input[type=email]:focus{border-color:var(--charcoal);}
+  button{
+    width:100%;
+    background:var(--charcoal);
+    color:var(--sand);
+    border:none;
+    border-radius:2px;
+    padding:15px 16px;
+    font-size:10px;
+    letter-spacing:3px;
+    text-transform:uppercase;
+    cursor:pointer;
+    font-weight:500;
+    font-family:'Inter',sans-serif;
+    transition:background 0.2s;
+  }
+  button:hover{background:var(--charcoal-mid);}
+  .msg{margin-top:16px;padding:12px 16px;font-size:12px;text-align:center;border-radius:2px;letter-spacing:0.3px;}
+  .msg.success{background:#E8F0E8;border:1px solid #B8D4B8;color:#2D5A2D;}
+  .msg.error{background:#F0E8E8;border:1px solid #D4B8B8;color:#5A2D2D;}
+  .footer{margin-top:40px;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--grey-light);text-align:center;}
 </style>
 </head>
 <body>
-<div class="logo">
-  <h1>NALU BY MONACO</h1>
-  <p>BUYER PORTAL</p>
-</div>
-<div class="card">
-  <div id="form-view">
-    <label for="email">YOUR EMAIL ADDRESS</label>
-    <input type="email" id="email" placeholder="you@example.com" autocomplete="email">
-    <button id="submit-btn" onclick="requestLink()">SEND MY ACCESS LINK</button>
-    <div id="message"></div>
+<div class="wrap">
+  <div class="logo">
+    <div class="logo-wordmark">Nalu by Monaco</div>
+    <div class="divider"></div>
+    <div class="logo-sub">Buyer Portal</div>
   </div>
+  <div class="card">
+    <div class="card-title">Access Your Portal</div>
+    <p class="card-desc">Enter your registered email address to receive a secure access link.</p>
+    <form id="loginForm">
+      <label for="email">Email Address</label>
+      <input type="email" id="email" name="email" placeholder="your@email.com" required autocomplete="email">
+      <button type="submit" id="btn">Send Access Link</button>
+    </form>
+    <div id="msg"></div>
+  </div>
+  <div class="footer">buyers.nalubymonaco.com.au</div>
 </div>
-<p class="footer">buyers.nalubymonaco.com.au</p>
 <script>
-const params = new URLSearchParams(location.search);
-if (params.get('error') === 'expired') {
-  document.getElementById('message').innerHTML = '<div class="msg error">That link has expired. Please request a new one.</div>';
-}
-
-async function requestLink() {
-  const email = document.getElementById('email').value.trim();
-  if (!email) { showMsg('Please enter your email address.', 'error'); return; }
-  const btn = document.getElementById('submit-btn');
-  btn.textContent = 'SENDING...';
-  btn.disabled = true;
-  try {
-    const r = await fetch('/api/request-link', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ email }) });
-    const d = await r.json();
-    if (d.success) {
-      showMsg('Check your email! We have sent you a secure access link. It expires in 15 minutes.', 'success');
-      document.getElementById('form-view').querySelector('input').disabled = true;
+document.getElementById('loginForm').addEventListener('submit',async function(e){
+  e.preventDefault();
+  const email=document.getElementById('email').value;
+  const btn=document.getElementById('btn');
+  const msg=document.getElementById('msg');
+  btn.textContent='Sending...';
+  btn.disabled=true;
+  msg.innerHTML='';
+  try{
+    const r=await fetch('/api/request-access',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({email})
+    });
+    const d=await r.json();
+    if(r.ok){
+      msg.className='msg success';
+      msg.textContent=d.message||'Access link sent. Please check your email.';
+      btn.textContent='Link Sent';
     } else {
-      showMsg(d.error || 'Something went wrong.', 'error');
+      msg.className='msg error';
+      msg.textContent=d.error||'This email is not registered. Please contact your agent.';
+      btn.textContent='Send Access Link';
+      btn.disabled=false;
     }
-  } catch(e) {
-    showMsg('Network error. Please try again.', 'error');
+  }catch(err){
+    msg.className='msg error';
+    msg.textContent='An error occurred. Please try again.';
+    btn.textContent='Send Access Link';
+    btn.disabled=false;
   }
-  btn.textContent = 'SEND MY ACCESS LINK';
-  btn.disabled = false;
-}
-
-function showMsg(msg, type) {
-  document.getElementById('message').innerHTML = '<div class="msg ' + type + '">' + msg + '</div>';
-}
-
-document.getElementById('email').addEventListener('keydown', e => { if(e.key==='Enter') requestLink(); });
+});
 </script>
 </body>
 </html>
