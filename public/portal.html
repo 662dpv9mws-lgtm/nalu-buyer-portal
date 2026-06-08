@@ -44,9 +44,10 @@ a.agent-btn:hover{background:#c9a84c;color:#000;}
 <div id="container"><div class="loading">Loading your properties...</div></div>
 <script>
 const token = location.pathname.split('/portal/')[1];
-(async()=>{
-  try{
-    const r=await fetch('/api/portal/'+token);
+  (async()=>{
+    try{
+      if(!token){document.getElementById('greeting').innerHTML='Hi <strong>there</strong>, welcome to the portal';document.getElementById('container').innerHTML='<div class="no-props">No properties assigned yet. Your agent will update this shortly.</div>';return;}
+      const r=await fetch('/api/portal/'+token);
     if(!r.ok){document.getElementById('container').innerHTML='<div class="no-props">Portal not found.</div>';return;}
     const{buyer,properties:props}=await r.json();
     document.getElementById('buyer-email').textContent=buyer.email;
