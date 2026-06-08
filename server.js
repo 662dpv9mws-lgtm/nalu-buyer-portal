@@ -8,7 +8,7 @@ const nodemailer = require('nodemailer');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const multer = require('multer');
-const Database = require('better-sqlite3')
+const Database = require('better-sqlite3');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -20,274 +20,318 @@ if (!fs.existsSync(dbDir)) fs.mkdirSync(dbDir, { recursive: true });
 const db = new Database(DB_PATH);
 db.pragma('journal_mode = WAL');
 
+// DB Schema
 db.exec(`
   CREATE TABLE IF NOT EXISTS admins (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     username TEXT UNIQUE NOT NULL,
-    password_hash TEXT NOT NULL,
-    display_name TEXT NOT NULL,
-    phone TEXT,
-    whatsapp TEXT,
+    password TEXT NOT NULL,
+    display_name TEXT,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
   );
   CREATE TABLE IF NOT EXISTS buyers (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,
     email TEXT UNIQUE NOT NULL,
-    phone TEXT,
     portal_token TEXT UNIQUE NOT NULL,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    last_visited DATETIME
+    last_visited DATETIME,
+    visit_count INTEGER DEFAULT 0,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
   );
   CREATE TABLE IF NOT EXISTS properties (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,
-    address TEXT NOT NULL,
-        unit_type TEXT,
-            level TEXT,
-                residence TEXT,
-                    aspect TEXT,
-                        beds TEXT,
-                            baths TEXT,
-                                cars TEXT,
-                                    sqm TEXT,
-                                        render_url TEXT,
-    price TEXT,
-    availability TEXT,
-    agent_id INTEGER REFERENCES admins(id),
+    type TEXT DEFAULT 'Residential',
+    address TEXT,
+    unit_type TEXT,
+    level TEXT,
+    residence TEXT,
+    aspect TEXT,
+    beds TEXT,
+    baths TEXT,
+    cars TEXT,
+    sqm TEXT,
+    render_url TEXT,
+    thumbnail_url TEXT,
+    description TEXT,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
   );
   CREATE TABLE IF NOT EXISTS buyer_properties (
-    buyer_id INTEGER REFERENCES buyers(id),
-    property_id INTEGER REFERENCES properties(id),
-    PRIMARY KEY (buyer_id, property_id)
+    buyer_id INTEGER,
+    property_id INTEGER,
+    PRIMARY KEY (buyer_id, property_id),
+    FOREIGN KEY (buyer_id) REFERENCES buyers(id) ON DELETE CASCADE,
+    FOREIGN KEY (property_id) REFERENCES properties(id) ON DELETE CASCADE
   );
   CREATE TABLE IF NOT EXISTS files (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    property_id INTEGER REFERENCES properties(id),
+    property_id INTEGER,
     name TEXT NOT NULL,
-    type TEXT NOT NULL,
-    url TEXT NOT NULL,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-  );
-  CREATE TABLE IF NOT EXISTS magic_links (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    buyer_id INTEGER REFERENCES buyers(id),
-    token TEXT UNIQUE NOT NULL,
-    expires_at DATETIME NOT NULL,
-    used INTEGER DEFAULT 0,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    file_type TEXT DEFAULT 'document',
+    file_url TEXT,
+    file_path TEXT,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (property_id) REFERENCES properties(id) ON DELETE CASCADE
   );
   CREATE TABLE IF NOT EXISTS activity (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    buyer_id INTEGER REFERENCES buyers(id),
-    action TEXT NOT NULL,
-    detail TEXT,
+    buyer_id INTEGER,
+    action TEXT,
+    details TEXT,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  );
+  CREATE TABLE IF NOT EXISTS settings (
+    key TEXT PRIMARY KEY,
+    value TEXT
+  );
+  CREATE TABLE IF NOT EXISTS magic_links (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    buyer_id INTEGER NOT NULL,
+    token TEXT UNIQUE NOT NULL,
+    expires_at DATETIME NOT NULL,
+    used INTEGER DEFAULT 0,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (buyer_id) REFERENCES buyers(id) ON DELETE CASCADE
   );
 `);
 
-// Migrate existing DB to add new columns
-const _pc=db.prepare('PRAGMA table_info(properties)').all().map(c=>c.name);
-['unit_type','level','residence','aspect','beds','baths','cars','sqm','render_url'].forEach(c=>{if(_pc.indexOf(c)===-1)db.prepare('ALTER TABLE properties ADD COLUMN '+c+' TEXT').run();});
-
-const adminCount = db.prepare('SELECT COUNT(*) as c FROM admins').get();
-if (adminCount.c === 0) {
-  const hash = bcrypt.hashSync(process.env.ADMIN_PASSWORD || 'admin123', 10);
-  db.prepare('INSERT INTO admins (username, password_hash, display_name, phone, whatsapp) VALUES (?, ?, ?, ?, ?)').run(process.env.ADMIN_USERNAME || 'admin', hash, process.env.ADMIN_DISPLAY_NAME || 'Admin User', process.env.ADMIN_PHONE || '', process.env.ADMIN_WHATSAPP || '');
-  console.log('Default admin created');
+// Seed default admin
+const adminExists = db.prepare('SELECT id FROM admins LIMIT 1').get();
+if (!adminExists) {
+  const pass = process.env.ADMIN_PASSWORD || 'admin123';
+  const hash = bcrypt.hashSync(pass, 10);
+  const name = process.env.ADMIN_DISPLAY_NAME || 'Admin';
+  db.prepare('INSERT INTO admins (username, password, display_name) VALUES (?,?,?)').run('admin', hash, name);
 }
 
+// Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(session({ secret: process.env.SESSION_SECRET || 'nalu-secret', resave: false, saveUninitialized: false, cookie: { maxAge: 24*60*60*1000 } }));
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'nalu-secret-2024',
+  resave: false,
+  saveUninitialized: false,
+  cookie: { secure: false, maxAge: 24 * 60 * 60 * 1000 }
+}));
 
+// File uploads
 const uploadsDir = path.join(__dirname, 'uploads');
 if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir, { recursive: true });
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, uploadsDir),
-  filename: (req, file, cb) => cb(null, Date.now() + '-' + Math.round(Math.random()*1e9) + path.extname(file.originalname))
+const upload = multer({ dest: uploadsDir, limits: { fileSize: 50 * 1024 * 1024 } });
+
+// JWT helper
+const JWT_SECRET = process.env.JWT_SECRET || 'nalu-jwt-2024';
+function signAdminToken(admin) { return jwt.sign({ admin_id: admin.id }, JWT_SECRET, { expiresIn: '8h' }); }
+function verifyAdminToken(req) {
+  const auth = req.headers.authorization;
+  const token = (auth && auth.startsWith('Bearer ')) ? auth.slice(7) : req.session.adminToken;
+  if (!token) return null;
+  try { return jwt.verify(token, JWT_SECRET); } catch { return null; }
+}
+function requireAdmin(req, res, next) {
+  const payload = verifyAdminToken(req);
+  if (!payload) return res.status(401).json({ error: 'Unauthorized' });
+  req.adminId = payload.admin_id;
+  next();
+}
+
+// Email
+const transporter = nodemailer.createTransport({
+  host: process.env.SMTP_HOST || 'smtp.gmail.com',
+  port: parseInt(process.env.SMTP_PORT || '587'),
+  secure: process.env.SMTP_SECURE === 'true',
+  auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS }
 });
-const upload = multer({ storage, limits: { fileSize: 50*1024*1024 } });
-app.use('/uploads', express.static(uploadsDir));
 
-function createTransporter() {
-  if (!process.env.SMTP_HOST) return null;
-  return nodemailer.createTransport({ host: process.env.SMTP_HOST, port: parseInt(process.env.SMTP_PORT||'587'), secure: process.env.SMTP_SECURE==='true', auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS } });
+async function sendMagicLink(email, name, link) {
+  if (!process.env.SMTP_USER) { console.log('Magic link:', link); return; }
+  await transporter.sendMail({
+    from: process.env.SMTP_FROM || 'noreply@nalubymonaco.com.au',
+    to: email,
+    subject: 'Your Nalu by Monaco Portal Access',
+    html: '<div style="font-family:Georgia,serif;max-width:500px;margin:0 auto;padding:40px 20px;background:#DFDACB"><h2 style="font-size:24px;font-weight:400;letter-spacing:4px;text-transform:uppercase;color:#282828;margin-bottom:8px">NALU BY MONACO</h2><p style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#7A7A7A;margin-bottom:32px">BUYER PORTAL</p><p style="font-size:15px;color:#282828;margin-bottom:8px">Dear ' + name + ',</p><p style="font-size:14px;color:#3D3D3D;line-height:1.6;margin-bottom:32px">Your secure access link is ready. This link expires in 24 hours.</p><a href="' + link + '" style="display:inline-block;background:#282828;color:#DFDACB;padding:14px 32px;text-decoration:none;font-size:11px;letter-spacing:3px;text-transform:uppercase;border-radius:2px">Access My Portal</a><p style="font-size:11px;color:#A8A8A8;margin-top:32px">buyers.nalubymonaco.com.au</p></div>'
+  });
 }
 
-async function sendMagicLinkEmail(to, name, url) {
-  const t = createTransporter();
-  const html = '<div style="font-family:Georgia,serif;max-width:600px;margin:0 auto;background:#0a0a0a;color:#fff;padding:40px;"><h1 style="color:#c9a84c;">NALU BY MONACO</h1><p>Hi ' + name + ',</p><p>Click below to access your portal (expires 15 minutes):</p><p><a href="' + url + '" style="background:#c9a84c;color:#000;padding:14px 32px;text-decoration:none;display:inline-block;font-weight:bold;">ACCESS MY PORTAL</a></p></div>';
-  if (t) { await t.sendMail({ from: process.env.SMTP_FROM||'noreply@nalubymonaco.com.au', to, subject: 'Your Nalu by Monaco Portal Access', html }); }
-  else { console.log('\n=== MAGIC LINK (dev) ===\nTo:', to, '\nURL:', url, '\n========================\n'); }
-}
+// ===== PAGE ROUTES =====
+app.get('/login', (req, res) => res.sendFile(path.join(__dirname, 'public', 'login.html')));
+app.get('/admin/login', (req, res) => res.sendFile(path.join(__dirname, 'public', 'admin-login.html')));
+app.get('/admin', (req, res) => res.sendFile(path.join(__dirname, 'public', 'admin.html')));
+app.get('/portal/:token', (req, res) => res.sendFile(path.join(__dirname, 'public', 'portal.html')));
 
-const JWT_SECRET = process.env.JWT_SECRET || 'nalu-jwt-secret';
-
-function adminAuth(req, res, next) {
-  const token = req.session.adminToken || (req.headers.authorization||'').split(' ')[1];
-  if (!token) return res.status(401).json({ error: 'Unauthorized' });
-  try {
-    const payload = jwt.verify(token, JWT_SECRET);
-    req.admin = db.prepare('SELECT * FROM admins WHERE id=?').get(payload.admin_id);
-    if (!req.admin) return res.status(401).json({ error: 'Admin not found' });
-    next();
-  } catch { return res.status(401).json({ error: 'Invalid token' }); }
-}
-
-function genToken() { return crypto.randomBytes(32).toString('base64url'); }
-function logAct(buyerId, action, detail) { db.prepare('INSERT INTO activity (buyer_id,action,detail) VALUES (?,?,?)').run(buyerId, action, detail); }
-
-app.get('/login', (req, res) => res.sendFile(path.join(__dirname,'public','login.html')));
-
-app.post('/api/request-link', async (req, res) => {
+// ===== AUTH ROUTES =====
+app.post('/api/request-access', async (req, res) => {
   const { email } = req.body;
   if (!email) return res.status(400).json({ error: 'Email required' });
-  const buyer = db.prepare('SELECT * FROM buyers WHERE LOWER(email)=LOWER(?)').get(email.trim());
-  const msg = 'If that email is registered, you will receive a link.';
-  if (!buyer) return res.json({ success: true, message: msg });
-  db.prepare('DELETE FROM magic_links WHERE buyer_id=? AND used=0').run(buyer.id);
-  const tok = genToken();
-  db.prepare('INSERT INTO magic_links (buyer_id,token,expires_at) VALUES (?,?,?)').run(buyer.id, tok, new Date(Date.now()+15*60*1000).toISOString());
-  const magicUrl = req.protocol+'://'+req.get('host')+'/auth/magic/'+tok;
-  try { await sendMagicLinkEmail(buyer.email,buyer.name,magicUrl); logAct(buyer.id,'magic_link_requested',buyer.email); } catch(e) { console.error(e.message); }
-  res.json({ success: true, message: msg });
+  const buyer = db.prepare('SELECT * FROM buyers WHERE LOWER(email) = LOWER(?)').get(email);
+  if (!buyer) return res.status(404).json({ error: 'Email not registered. Please contact your agent.' });
+  const token = crypto.randomBytes(32).toString('hex');
+  const expires = new Date(Date.now() + 15 * 60 * 1000).toISOString();
+  db.prepare('INSERT INTO magic_links (buyer_id, token, expires_at) VALUES (?,?,?)').run(buyer.id, token, expires);
+  const link = (process.env.SITE_URL || ('http://localhost:' + PORT)) + '/portal/' + buyer.portal_token + '?t=' + token;
+  try {
+    await sendMagicLink(buyer.email, buyer.name, link);
+    res.json({ message: 'Access link sent to ' + buyer.email });
+  } catch (e) {
+    console.error('Email error:', e.message);
+    res.json({ message: 'Access link sent to ' + buyer.email });
+  }
 });
-
-app.get('/auth/magic/:token', (req, res) => {
-  const link = db.prepare('SELECT * FROM magic_links WHERE token=? AND used=0').get(req.params.token);
-  if (!link || new Date(link.expires_at)<new Date()) return res.redirect('/login?error=expired');
-  db.prepare('UPDATE magic_links SET used=1 WHERE id=?').run(link.id);
-  db.prepare('UPDATE buyers SET last_visited=CURRENT_TIMESTAMP WHERE id=?').run(link.buyer_id);
-  const buyer = db.prepare('SELECT * FROM buyers WHERE id=?').get(link.buyer_id);
-  req.session.buyerId = buyer.id;
-  logAct(buyer.id,'logged_in','Magic link');
-  res.redirect('/portal/'+buyer.portal_token);
-});
-
-app.get('/portal/:token', (req, res) => {
-    res.sendFile(path.join(__dirname,'public','portal.html'));
-});
-
-app.get('/api/portal/:token', (req, res) => {
-  const buyer = db.prepare('SELECT * FROM buyers WHERE portal_token=?').get(req.params.token);
-  if (!buyer) return res.status(404).json({ error:'Not found' });
-  const props = db.prepare('SELECT p.*,a.display_name as agent_name,a.phone as agent_phone,a.whatsapp as agent_whatsapp FROM properties p JOIN buyer_properties bp ON bp.property_id=p.id LEFT JOIN admins a ON a.id=p.agent_id WHERE bp.buyer_id=? ORDER BY p.created_at DESC').all(buyer.id);
-  res.json({ buyer:{name:buyer.name,email:buyer.email}, properties:props.map(p=>({...p,files:db.prepare('SELECT * FROM files WHERE property_id=? ORDER BY type,name').all(p.id)})) });
-});
-
-app.get('/admin/login', (req, res) => res.sendFile(path.join(__dirname,'public','admin-login.html')));
 
 app.post('/api/admin/login', (req, res) => {
-  const admin = db.prepare('SELECT * FROM admins WHERE username=?').get(req.body.username);
-  if (!admin||!bcrypt.compareSync(req.body.password,admin.password_hash)) return res.status(401).json({error:'Invalid credentials'});
-  const token = jwt.sign({admin_id:admin.id},JWT_SECRET,{expiresIn:'8h'});
+  const { username, password } = req.body;
+  if (!username || !password) return res.status(400).json({ error: 'Username and password required' });
+  const admin = db.prepare('SELECT * FROM admins WHERE username = ?').get(username);
+  if (!admin || !bcrypt.compareSync(password, admin.password)) return res.status(401).json({ error: 'Invalid credentials' });
+  const token = signAdminToken(admin);
   req.session.adminToken = token;
-  res.json({success:true,token,admin:{id:admin.id,display_name:admin.display_name,username:admin.username}});
+  res.json({ success: true, token, admin: { id: admin.id, display_name: admin.display_name, username: admin.username } });
 });
 
-app.post('/api/admin/logout',(req,res)=>{req.session.destroy();res.json({success:true});});
-app.get('/admin',(req,res)=>res.sendFile(path.join(__dirname,'public','admin.html')));
-app.get('/api/admin/me',adminAuth,(req,res)=>{const{password_hash,...a}=req.admin;res.json(a);});
-
-app.get('/api/admin/buyers',adminAuth,(req,res)=>res.json(db.prepare('SELECT b.*,COUNT(a.id) as activity_count FROM buyers b LEFT JOIN activity a ON a.buyer_id=b.id GROUP BY b.id ORDER BY b.created_at DESC').all()));
-
-app.post('/api/admin/buyers',adminAuth,(req,res)=>{
-  const{name,email,phone}=req.body;
-  if(!name||!email)return res.status(400).json({error:'Name and email required'});
-  try{const r=db.prepare('INSERT INTO buyers (name,email,phone,portal_token) VALUES (?,?,?,?)').run(name.trim(),email.trim().toLowerCase(),phone||null,genToken());res.json({success:true,buyer:db.prepare('SELECT * FROM buyers WHERE id=?').get(r.lastInsertRowid)});}
-  catch(e){res.status(e.message.includes('UNIQUE')?400:500).json({error:e.message.includes('UNIQUE')?'Email already exists':e.message});}
+app.post('/api/admin/logout', (req, res) => {
+  req.session.destroy();
+  res.json({ success: true });
 });
 
-app.put('/api/admin/buyers/:id',adminAuth,(req,res)=>{const{name,email,phone}=req.body;db.prepare('UPDATE buyers SET name=?,email=?,phone=? WHERE id=?').run(name,email.toLowerCase(),phone||null,req.params.id);res.json({success:true});});
-
-app.delete('/api/admin/buyers/:id',adminAuth,(req,res)=>{
-  const id=req.params.id;
-  ['DELETE FROM activity WHERE buyer_id=?','DELETE FROM magic_links WHERE buyer_id=?','DELETE FROM buyer_properties WHERE buyer_id=?','DELETE FROM buyers WHERE id=?'].forEach(q=>db.prepare(q).run(id));
-  res.json({success:true});
+// ===== PORTAL API =====
+app.get('/api/portal/:token', (req, res) => {
+  const buyer = db.prepare('SELECT * FROM buyers WHERE portal_token = ?').get(req.params.token);
+  if (!buyer) return res.status(404).json({ error: 'Portal not found' });
+  const queryToken = req.query.t;
+  if (queryToken) {
+    const ml = db.prepare('SELECT * FROM magic_links WHERE token = ? AND buyer_id = ? AND used = 0 AND expires_at > datetime("now")').get(queryToken, buyer.id);
+    if (ml) db.prepare('UPDATE magic_links SET used = 1 WHERE id = ?').run(ml.id);
+  }
+  db.prepare('UPDATE buyers SET last_visited = CURRENT_TIMESTAMP, visit_count = visit_count + 1 WHERE id = ?').run(buyer.id);
+  db.prepare('INSERT INTO activity (buyer_id, action) VALUES (?, ?)').run(buyer.id, 'portal_view');
+  const properties = db.prepare('SELECT p.* FROM properties p INNER JOIN buyer_properties bp ON p.id = bp.property_id WHERE bp.buyer_id = ?').all(buyer.id);
+  const propertiesWithFiles = properties.map(p => {
+    const files = db.prepare('SELECT * FROM files WHERE property_id = ?').all(p.id);
+    return { ...p, files };
+  });
+  const agentSettings = {};
+  const settingRows = db.prepare('SELECT key, value FROM settings WHERE key LIKE ?').all('agent_%');
+  settingRows.forEach(r => { agentSettings[r.key.replace('agent_', '')] = r.value; });
+  res.json({ buyer, properties: propertiesWithFiles, agent: agentSettings });
 });
 
-app.post('/api/admin/buyers/:buyerId/properties/:propertyId',adminAuth,(req,res)=>{try{db.prepare('INSERT OR IGNORE INTO buyer_properties (buyer_id,property_id) VALUES (?,?)').run(req.params.buyerId,req.params.propertyId);res.json({success:true});}catch(e){res.status(500).json({error:e.message});}});
-app.delete('/api/admin/buyers/:buyerId/properties/:propertyId',adminAuth,(req,res)=>{db.prepare('DELETE FROM buyer_properties WHERE buyer_id=? AND property_id=?').run(req.params.buyerId,req.params.propertyId);res.json({success:true});});
-app.get('/api/admin/buyers/:id/properties',adminAuth,(req,res)=>res.json(db.prepare('SELECT p.id FROM properties p JOIN buyer_properties bp ON bp.property_id=p.id WHERE bp.buyer_id=?').all(req.params.id).map(p=>p.id)));
-
-app.post('/api/admin/buyers/:id/send-link',adminAuth,async(req,res)=>{
-  const buyer=db.prepare('SELECT * FROM buyers WHERE id=?').get(req.params.id);
-  if(!buyer)return res.status(404).json({error:'Buyer not found'});
-  db.prepare('DELETE FROM magic_links WHERE buyer_id=? AND used=0').run(buyer.id);
-  const tok=genToken();
-  db.prepare('INSERT INTO magic_links (buyer_id,token,expires_at) VALUES (?,?,?)').run(buyer.id,tok,new Date(Date.now()+24*60*60*1000).toISOString());
-  const url=req.protocol+'://'+req.get('host')+'/auth/magic/'+tok;
-  try{await sendMagicLinkEmail(buyer.email,buyer.name,url);res.json({success:true,message:'Link sent',url});}
-  catch(e){res.json({success:true,message:'Email failed but link generated',url});}
+// ===== ADMIN BUYERS =====
+app.get('/api/admin/buyers', requireAdmin, (req, res) => {
+  const buyers = db.prepare('SELECT b.*, (SELECT COUNT(*) FROM buyer_properties bp WHERE bp.buyer_id = b.id) as property_count FROM buyers b ORDER BY b.created_at DESC').all();
+  res.json(buyers);
 });
 
-app.get('/api/admin/buyers/:id/portal-link',adminAuth,(req,res)=>{
-  const b=db.prepare('SELECT portal_token FROM buyers WHERE id=?').get(req.params.id);
-  if(!b)return res.status(404).json({error:'Not found'});
-  res.json({url:req.protocol+'://'+req.get('host')+'/portal/'+b.portal_token,token:b.portal_token});
+app.post('/api/admin/buyers', requireAdmin, (req, res) => {
+  const { name, email, property_ids } = req.body;
+  if (!name || !email) return res.status(400).json({ error: 'Name and email required' });
+  const existing = db.prepare('SELECT id FROM buyers WHERE LOWER(email) = LOWER(?)').get(email);
+  if (existing) return res.status(409).json({ error: 'Email already registered' });
+  const token = crypto.randomBytes(32).toString('hex');
+  const result = db.prepare('INSERT INTO buyers (name, email, portal_token) VALUES (?,?,?)').run(name, email, token);
+  if (property_ids && property_ids.length) {
+    const insert = db.prepare('INSERT OR IGNORE INTO buyer_properties (buyer_id, property_id) VALUES (?,?)');
+    property_ids.forEach(pid => insert.run(result.lastInsertRowid, pid));
+  }
+  res.json({ id: result.lastInsertRowid, portal_token: token });
 });
 
-app.get('/api/admin/properties',adminAuth,(req,res)=>res.json(db.prepare('SELECT p.*,a.display_name as agent_name,(SELECT COUNT(*) FROM files f WHERE f.property_id=p.id) as file_count FROM properties p LEFT JOIN admins a ON a.id=p.agent_id ORDER BY p.created_at DESC').all()));
-
-app.post('/api/admin/properties',adminAuth,(req,res)=>{
-  const{name,address,price,availability,agent_id}=req.body;
-  if(!name||!address)return res.status(400).json({error:'Name and address required'});
-  const r=db.prepare('INSERT INTO properties (name,address,price,availability,agent_id) VALUES (?,?,?,?,?)').run(name,address,price||null,availability||null,agent_id||req.admin.id);
-  res.json({success:true,property:db.prepare('SELECT * FROM properties WHERE id=?').get(r.lastInsertRowid)});
+app.delete('/api/admin/buyers/:id', requireAdmin, (req, res) => {
+  db.prepare('DELETE FROM buyers WHERE id = ?').run(req.params.id);
+  res.json({ success: true });
 });
 
-app.put('/api/admin/properties/:id',adminAuth,(req,res)=>{const{name,address,price,availability,agent_id}=req.body;db.prepare('UPDATE properties SET name=?,address=?,price=?,availability=?,agent_id=? WHERE id=?').run(name,address,price||null,availability||null,agent_id||req.admin.id,req.params.id);res.json({success:true});});
-
-app.delete('/api/admin/properties/:id',adminAuth,(req,res)=>{
-  const id=req.params.id;
-  ['DELETE FROM buyer_properties WHERE property_id=?','DELETE FROM files WHERE property_id=?','DELETE FROM properties WHERE id=?'].forEach(q=>db.prepare(q).run(id));
-  res.json({success:true});
+// ===== ADMIN PROPERTIES =====
+app.get('/api/admin/properties', requireAdmin, (req, res) => {
+  const props = db.prepare('SELECT p.*, (SELECT COUNT(*) FROM buyer_properties bp WHERE bp.property_id = p.id) as buyer_count FROM properties p ORDER BY p.created_at DESC').all();
+  res.json(props);
 });
 
-app.get('/api/admin/properties/:id/files',adminAuth,(req,res)=>res.json(db.prepare('SELECT * FROM files WHERE property_id=? ORDER BY type,name').all(req.params.id)));
-
-app.post('/api/admin/files',adminAuth,(req,res)=>{
-  const{property_id,name,type,url}=req.body;
-  if(!property_id||!name||!url)return res.status(400).json({error:'property_id, name, url required'});
-  const ft=type||(url.match(/\.(jpg|jpeg|png|gif|webp)$/i)?'image':'document');
-  const r=db.prepare('INSERT INTO files (property_id,name,type,url) VALUES (?,?,?,?)').run(property_id,name,ft,url);
-  res.json({success:true,file:db.prepare('SELECT * FROM files WHERE id=?').get(r.lastInsertRowid)});
+app.post('/api/admin/properties', requireAdmin, (req, res) => {
+  const { name, type, address, unit_type, level, residence, aspect, beds, baths, cars, sqm, render_url, thumbnail_url, description } = req.body;
+  if (!name) return res.status(400).json({ error: 'Name required' });
+  const result = db.prepare('INSERT INTO properties (name,type,address,unit_type,level,residence,aspect,beds,baths,cars,sqm,render_url,thumbnail_url,description) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)').run(name,type||'Residential',address||'',unit_type||'',level||'',residence||'',aspect||'',beds||'',baths||'',cars||'',sqm||'',render_url||'',thumbnail_url||'',description||'');
+  res.json({ id: result.lastInsertRowid });
 });
 
-app.post('/api/admin/files/upload',adminAuth,upload.single('file'),(req,res)=>{
-  if(!req.file)return res.status(400).json({error:'No file uploaded'});
-  if(!req.body.property_id)return res.status(400).json({error:'property_id required'});
-  const url='/uploads/'+req.file.filename;
-  const ft=req.body.type||(req.file.mimetype.startsWith('image/')?'image':'document');
-  const r=db.prepare('INSERT INTO files (property_id,name,type,url) VALUES (?,?,?,?)').run(req.body.property_id,req.body.name||req.file.originalname,ft,url);
-  res.json({success:true,file:db.prepare('SELECT * FROM files WHERE id=?').get(r.lastInsertRowid)});
+app.delete('/api/admin/properties/:id', requireAdmin, (req, res) => {
+  db.prepare('DELETE FROM properties WHERE id = ?').run(req.params.id);
+  res.json({ success: true });
 });
 
-app.delete('/api/admin/files/:id',adminAuth,(req,res)=>{
-  const f=db.prepare('SELECT * FROM files WHERE id=?').get(req.params.id);
-  if(f&&f.url.startsWith('/uploads/')){const p=path.join(__dirname,f.url);if(fs.existsSync(p))fs.unlinkSync(p);}
-  db.prepare('DELETE FROM files WHERE id=?').run(req.params.id);
-  res.json({success:true});
+// ===== ADMIN FILES =====
+app.get('/api/admin/files', requireAdmin, (req, res) => {
+  const files = db.prepare('SELECT f.*, p.name as property_name FROM files f LEFT JOIN properties p ON f.property_id = p.id ORDER BY f.created_at DESC').all();
+  res.json(files);
 });
 
-app.get('/api/admin/admins',adminAuth,(req,res)=>res.json(db.prepare('SELECT id,username,display_name,phone,whatsapp,created_at FROM admins').all()));
-
-app.post('/api/admin/admins',adminAuth,(req,res)=>{
-  const{username,password,display_name,phone,whatsapp}=req.body;
-  if(!username||!password||!display_name)return res.status(400).json({error:'username, password, display_name required'});
-  try{const r=db.prepare('INSERT INTO admins (username,password_hash,display_name,phone,whatsapp) VALUES (?,?,?,?,?)').run(username,bcrypt.hashSync(password,10),display_name,phone||null,whatsapp||null);res.json({success:true,id:r.lastInsertRowid});}
-  catch(e){res.status(e.message.includes('UNIQUE')?400:500).json({error:e.message.includes('UNIQUE')?'Username exists':e.message});}
+app.post('/api/admin/files', requireAdmin, (req, res) => {
+  const { property_id, name, file_type, file_url } = req.body;
+  if (!property_id || !name) return res.status(400).json({ error: 'Property and name required' });
+  const result = db.prepare('INSERT INTO files (property_id,name,file_type,file_url) VALUES (?,?,?,?)').run(property_id, name, file_type||'document', file_url||'');
+  res.json({ id: result.lastInsertRowid });
 });
 
-app.get('/api/admin/activity',adminAuth,(req,res)=>{
-  const{buyer_id}=req.query;
-  if(buyer_id){res.json(db.prepare('SELECT * FROM activity WHERE buyer_id=? ORDER BY created_at DESC LIMIT 100').all(buyer_id));}
-  else{res.json(db.prepare('SELECT a.*,b.name as buyer_name,b.email as buyer_email FROM activity a JOIN buyers b ON b.id=a.buyer_id ORDER BY a.created_at DESC LIMIT 200').all());}
+app.post('/api/admin/files/upload', requireAdmin, upload.single('file'), (req, res) => {
+  if (!req.file) return res.status(400).json({ error: 'No file uploaded' });
+  const { property_id, name, file_type } = req.body;
+  const fileUrl = '/uploads/' + req.file.filename;
+  const result = db.prepare('INSERT INTO files (property_id,name,file_type,file_path,file_url) VALUES (?,?,?,?,?)').run(property_id, name||req.file.originalname, file_type||'document', req.file.path, fileUrl);
+  res.json({ id: result.lastInsertRowid, file_url: fileUrl });
 });
 
-app.get('/',(req,res)=>res.sendFile(path.join(__dirname,'public','portal.html')));
-app.use((req,res)=>res.status(404).sendFile(path.join(__dirname,'public','404.html')));
-app.listen(PORT,()=>console.log('Nalu Buyer Portal running on port '+PORT));
+app.delete('/api/admin/files/:id', requireAdmin, (req, res) => {
+  const file = db.prepare('SELECT * FROM files WHERE id = ?').get(req.params.id);
+  if (file && file.file_path) { try { fs.unlinkSync(file.file_path); } catch {} }
+  db.prepare('DELETE FROM files WHERE id = ?').run(req.params.id);
+  res.json({ success: true });
+});
+
+// ===== ACTIVITY =====
+app.get('/api/admin/activity', requireAdmin, (req, res) => {
+  const rows = db.prepare('SELECT a.*, b.name as buyer_name FROM activity a LEFT JOIN buyers b ON a.buyer_id = b.id ORDER BY a.created_at DESC LIMIT 100').all();
+  res.json(rows);
+});
+
+// ===== ADMIN SEND LINK =====
+app.post('/api/admin/send-link', requireAdmin, async (req, res) => {
+  const { buyer_id } = req.body;
+  const buyer = db.prepare('SELECT * FROM buyers WHERE id = ?').get(buyer_id);
+  if (!buyer) return res.status(404).json({ error: 'Buyer not found' });
+  const token = crypto.randomBytes(32).toString('hex');
+  const expires = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
+  db.prepare('INSERT INTO magic_links (buyer_id, token, expires_at) VALUES (?,?,?)').run(buyer.id, token, expires);
+  const link = (process.env.SITE_URL || ('http://localhost:' + PORT)) + '/portal/' + buyer.portal_token + '?t=' + token;
+  try {
+    await sendMagicLink(buyer.email, buyer.name, link);
+    res.json({ success: true, message: 'Link sent to ' + buyer.email });
+  } catch (e) {
+    res.status(500).json({ error: 'Failed to send email: ' + e.message });
+  }
+});
+
+// ===== SETTINGS =====
+app.post('/api/admin/settings/agent', requireAdmin, (req, res) => {
+  const fields = ['name','title','phone','whatsapp','email','photo_url'];
+  const upsert = db.prepare('INSERT INTO settings (key,value) VALUES (?,?) ON CONFLICT(key) DO UPDATE SET value=excluded.value');
+  fields.forEach(f => { if (req.body[f] !== undefined) upsert.run('agent_' + f, req.body[f]); });
+  res.json({ success: true });
+});
+
+app.post('/api/admin/admins', requireAdmin, (req, res) => {
+  const { username, password, display_name } = req.body;
+  if (!username || !password) return res.status(400).json({ error: 'Username and password required' });
+  const exists = db.prepare('SELECT id FROM admins WHERE username = ?').get(username);
+  if (exists) return res.status(409).json({ error: 'Username taken' });
+  const hash = bcrypt.hashSync(password, 10);
+  const result = db.prepare('INSERT INTO admins (username,password,display_name) VALUES (?,?,?)').run(username, hash, display_name||username);
+  res.json({ id: result.lastInsertRowid });
+});
+
+// Uploads static
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+// 404
+app.use((req, res) => res.status(404).sendFile(path.join(__dirname, 'public', '404.html')));
+
+app.listen(PORT, () => console.log('Nalu Buyer Portal running on port ' + PORT));
