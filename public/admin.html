@@ -4,418 +4,507 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Admin | Nalu by Monaco</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
-body{background:#0a0a0a;color:#fff;font-family:Georgia,serif;display:flex;min-height:100vh;}
-nav{width:220px;min-height:100vh;background:#0d0d0d;border-right:1px solid #1a1a1a;display:flex;flex-direction:column;padding:24px 0;flex-shrink:0;}
-.nav-logo{color:#c9a84c;letter-spacing:4px;font-size:16px;padding:0 20px 24px;border-bottom:1px solid #1a1a1a;margin-bottom:8px;}
-.nav-item{padding:14px 20px;cursor:pointer;font-size:12px;letter-spacing:2px;color:#666;border-left:3px solid transparent;}
-.nav-item:hover{color:#fff;background:#111;}
-.nav-item.active{color:#c9a84c;border-left-color:#c9a84c;background:#111;}
-.nav-footer{margin-top:auto;padding:20px;border-top:1px solid #1a1a1a;}
-.nav-admin{font-size:12px;color:#666;margin-bottom:10px;}
-.nav-logout{color:#c9a84c;font-size:11px;letter-spacing:1px;cursor:pointer;}
-main{flex:1;padding:40px;overflow-y:auto;}
-h2{font-size:28px;font-weight:normal;margin-bottom:4px;}
-.sub{color:#555;font-size:13px;margin-bottom:32px;}
-hr{border:none;border-top:1px solid #1a1a1a;margin-bottom:32px;}
-.btn{background:#c9a84c;color:#000;border:none;padding:12px 24px;font-size:11px;letter-spacing:2px;cursor:pointer;font-weight:bold;font-family:Georgia,serif;}
-.btn:hover{background:#b8963e;}
-.btn-sm{padding:6px 14px;font-size:10px;}
-.btn-outline{background:none;border:1px solid #c9a84c;color:#c9a84c;}
-.btn-outline:hover{background:#c9a84c;color:#000;}
-.btn-danger{background:none;border:1px solid #c0392b;color:#c0392b;}
-.btn-danger:hover{background:#c0392b;color:#fff;}
+:root{
+  --sand:#DFDACB;--sand-light:#EDEAE0;--sand-dark:#C8C3B0;
+  --charcoal:#282828;--charcoal-mid:#3D3D3D;--charcoal-light:#4A4A4A;
+  --grey:#7A7A7A;--grey-light:#A8A8A8;--white:#FAFAF8;--border:#C8C3B0;
+  --sidebar-w:220px;
+}
+body{background:var(--sand-light);color:var(--charcoal);font-family:'Inter',sans-serif;display:flex;min-height:100vh;}
+
+/* SIDEBAR */
+.sidebar{width:var(--sidebar-w);background:var(--charcoal);display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100vh;z-index:50;}
+.sidebar-brand{padding:28px 24px 20px;border-bottom:1px solid #333;}
+.sidebar-brand-name{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:400;letter-spacing:4px;text-transform:uppercase;color:var(--sand);line-height:1;}
+.sidebar-brand-sub{font-size:8px;letter-spacing:2.5px;text-transform:uppercase;color:var(--grey);margin-top:6px;}
+.sidebar-nav{flex:1;padding:24px 0;}
+.nav-item{display:block;padding:11px 24px;font-size:9px;letter-spacing:2.5px;text-transform:uppercase;color:var(--grey);cursor:pointer;transition:color 0.15s,background 0.15s;border-left:2px solid transparent;text-decoration:none;}
+.nav-item:hover{color:var(--sand-dark);background:rgba(255,255,255,0.03);}
+.nav-item.active{color:var(--sand);border-left-color:var(--sand-dark);background:rgba(255,255,255,0.05);}
+.sidebar-footer{padding:20px 24px;border-top:1px solid #333;}
+.logout-btn{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--grey);cursor:pointer;background:none;border:none;font-family:'Inter',sans-serif;transition:color 0.15s;}
+.logout-btn:hover{color:var(--sand-dark);}
+
+/* MAIN */
+.main{margin-left:var(--sidebar-w);flex:1;display:flex;flex-direction:column;min-height:100vh;}
+.topbar{background:var(--white);border-bottom:1px solid var(--border);padding:20px 40px;display:flex;align-items:center;justify-content:space-between;}
+.page-title{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:400;color:var(--charcoal);}
+.page-sub{font-size:11px;color:var(--grey);margin-top:2px;letter-spacing:0.2px;}
+.content{padding:40px;flex:1;}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:8px;padding:10px 20px;border-radius:2px;font-size:9px;letter-spacing:2.5px;text-transform:uppercase;cursor:pointer;font-weight:500;font-family:'Inter',sans-serif;transition:all 0.15s;border:none;}
+.btn-primary{background:var(--charcoal);color:var(--sand);}
+.btn-primary:hover{background:var(--charcoal-mid);}
+.btn-outline{background:transparent;color:var(--charcoal);border:1px solid var(--border);}
+.btn-outline:hover{border-color:var(--charcoal);}
+.btn-danger{background:transparent;color:#B05050;border:1px solid #D4B4B4;}
+.btn-danger:hover{background:#F0E8E8;}
+.btn-sand{background:var(--sand);color:var(--charcoal);}
+.btn-sand:hover{background:var(--sand-dark);}
+.btn-sm{padding:7px 14px;font-size:8px;}
+
+/* TABLE */
+.table-wrap{background:var(--white);border:1px solid var(--border);border-radius:4px;overflow:hidden;}
 table{width:100%;border-collapse:collapse;}
-th{text-align:left;color:#666;font-size:10px;letter-spacing:2px;padding:12px 16px;border-bottom:1px solid #1a1a1a;font-weight:normal;}
-td{padding:14px 16px;border-bottom:1px solid #111;font-size:13px;vertical-align:middle;}
-tr:hover td{background:#0d0d0d;}
-.portal-token{font-size:11px;color:#666;font-family:monospace;}
-.badge{background:#1a2b1a;color:#4caf82;padding:3px 8px;font-size:10px;letter-spacing:1px;}
-.section{display:none;}
-.section.active{display:block;}
-.modal-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);z-index:100;display:flex;align-items:center;justify-content:center;}
-.modal{background:#111;border:1px solid #222;padding:40px;width:100%;max-width:480px;max-height:90vh;overflow-y:auto;}
-.modal h3{font-size:20px;font-weight:normal;margin-bottom:24px;color:#c9a84c;}
+thead th{padding:12px 20px;font-size:8px;letter-spacing:2.5px;text-transform:uppercase;color:var(--grey);text-align:left;border-bottom:1px solid var(--border);font-weight:500;background:var(--sand-light);}
+tbody tr{border-bottom:1px solid var(--sand);}
+tbody tr:last-child{border-bottom:none;}
+tbody td{padding:14px 20px;font-size:13px;color:var(--charcoal);vertical-align:middle;}
+tbody tr:hover{background:var(--sand-light);}
+.table-actions{display:flex;gap:8px;align-items:center;}
+
+/* MODAL */
+.modal-backdrop{position:fixed;inset:0;background:rgba(40,40,40,0.6);z-index:200;display:none;align-items:center;justify-content:center;padding:20px;}
+.modal-backdrop.open{display:flex;}
+.modal{background:var(--white);border-radius:4px;width:100%;max-width:520px;max-height:90vh;overflow-y:auto;}
+.modal-header{padding:28px 32px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.modal-title{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:400;color:var(--charcoal);}
+.modal-close{background:none;border:none;font-size:20px;color:var(--grey);cursor:pointer;line-height:1;padding:4px;}
+.modal-close:hover{color:var(--charcoal);}
+.modal-body{padding:28px 32px;}
+.modal-footer{padding:20px 32px 28px;display:flex;justify-content:flex-end;gap:12px;}
+
+/* FORMS */
 .form-group{margin-bottom:20px;}
-label{display:block;color:#666;font-size:10px;letter-spacing:2px;margin-bottom:8px;}
-input,select,textarea{width:100%;background:#0a0a0a;border:1px solid #333;color:#fff;padding:12px 14px;font-size:13px;outline:none;font-family:Georgia,serif;}
-input:focus,select:focus,textarea:focus{border-color:#c9a84c;}
-select option{background:#111;}
-.modal-btns{display:flex;gap:12px;margin-top:24px;}
-.prop-checkbox{display:flex;align-items:center;gap:10px;padding:10px;border:1px solid #1a1a1a;margin-bottom:6px;cursor:pointer;}
-.prop-checkbox:hover{border-color:#333;}
-.prop-checkbox input[type=checkbox]{width:auto;margin:0;}
-.link-box{background:#0a0a0a;border:1px solid #333;padding:12px;font-family:monospace;font-size:12px;word-break:break-all;color:#c9a84c;margin:12px 0;}
-.activity-item{padding:14px;border-bottom:1px solid #111;display:flex;gap:16px;align-items:flex-start;}
-.activity-dot{width:8px;height:8px;background:#c9a84c;border-radius:50%;margin-top:5px;flex-shrink:0;}
-.activity-time{color:#555;font-size:11px;}
-.file-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid #111;}
-.file-row-info{display:flex;align-items:center;gap:10px;}
-.tab-row{display:flex;gap:1px;margin-bottom:24px;}
-.tab{padding:10px 20px;background:#111;color:#666;cursor:pointer;font-size:11px;letter-spacing:1px;}
-.tab.active{background:#c9a84c;color:#000;}
-.alert{padding:14px;margin-bottom:16px;border:1px solid;font-size:13px;}
-.alert.success{background:#0d2b1a;border-color:#1a5c36;color:#4caf82;}
-.alert.error{background:#2b0d0d;border-color:#5c1a1a;color:#f47878;}
+.form-label{display:block;font-size:9px;letter-spacing:2.5px;text-transform:uppercase;color:var(--grey);margin-bottom:8px;font-weight:500;}
+.form-input{width:100%;background:var(--sand-light);border:1px solid var(--border);border-radius:2px;color:var(--charcoal);padding:11px 14px;font-size:13px;outline:none;font-family:'Inter',sans-serif;transition:border-color 0.15s;}
+.form-input:focus{border-color:var(--charcoal);}
+.form-input::placeholder{color:var(--grey-light);}
+select.form-input{cursor:pointer;}
+textarea.form-input{resize:vertical;min-height:80px;}
+
+/* BADGES / TAGS */
+.badge{display:inline-flex;padding:3px 10px;border-radius:20px;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;font-weight:500;}
+.badge-sand{background:var(--sand);color:var(--charcoal-light);}
+.badge-grey{background:#E8E4DA;color:var(--grey);}
+
+/* CARD */
+.card{background:var(--white);border:1px solid var(--border);border-radius:4px;padding:28px;}
+
+/* STATS */
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:20px;margin-bottom:40px;}
+.stat-card{background:var(--white);border:1px solid var(--border);border-radius:4px;padding:24px;}
+.stat-label{font-size:8px;letter-spacing:2.5px;text-transform:uppercase;color:var(--grey);margin-bottom:10px;}
+.stat-value{font-family:'Cormorant Garamond',serif;font-size:40px;font-weight:400;color:var(--charcoal);line-height:1;}
+
+/* SECTION HEADER */
+.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;}
+.section-title{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:400;color:var(--charcoal);}
+
+/* EMPTY */
+.empty-row td{text-align:center;padding:48px!important;color:var(--grey);font-size:13px;}
+
+/* FILE UPLOAD AREA */
+.upload-zone{border:2px dashed var(--border);border-radius:4px;padding:40px;text-align:center;cursor:pointer;transition:all 0.2s;background:var(--white);}
+.upload-zone:hover,.upload-zone.drag-over{border-color:var(--charcoal);background:var(--sand-light);}
+.upload-zone-title{font-size:13px;color:var(--charcoal);margin-bottom:6px;}
+.upload-zone-sub{font-size:11px;color:var(--grey);}
+
+/* ACTIVITY */
+.activity-list{display:flex;flex-direction:column;gap:0;}
+.activity-item{display:flex;align-items:flex-start;gap:16px;padding:14px 20px;border-bottom:1px solid var(--sand);background:var(--white);}
+.activity-item:last-child{border-bottom:none;}
+.activity-dot{width:8px;height:8px;border-radius:50%;background:var(--sand-dark);flex-shrink:0;margin-top:4px;}
+.activity-text{font-size:13px;color:var(--charcoal);flex:1;}
+.activity-time{font-size:11px;color:var(--grey-light);}
+
+/* SETTINGS */
+.settings-section{margin-bottom:40px;}
+.settings-section-title{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:400;color:var(--charcoal);margin-bottom:20px;padding-bottom:12px;border-bottom:1px solid var(--border);}
+
+/* PANEL PAGES */
+.panel-page{display:none;}
+.panel-page.active{display:block;}
+
+/* TOAST */
+.toast{position:fixed;bottom:32px;right:32px;background:var(--charcoal);color:var(--sand);padding:14px 24px;border-radius:4px;font-size:12px;letter-spacing:0.3px;z-index:999;opacity:0;transform:translateY(8px);transition:all 0.3s;pointer-events:none;}
+.toast.show{opacity:1;transform:translateY(0);}
+.toast.error{background:#5A2D2D;}
+
+/* CHECKBOX LIST */
+.checkbox-list{max-height:200px;overflow-y:auto;border:1px solid var(--border);border-radius:2px;background:var(--sand-light);}
+.checkbox-item{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--sand);}
+.checkbox-item:last-child{border-bottom:none;}
+.checkbox-item input[type=checkbox]{accent-color:var(--charcoal);width:14px;height:14px;}
+.checkbox-item label{font-size:13px;color:var(--charcoal);cursor:pointer;}
+
+/* DIVIDER */
+.divider-line{height:1px;background:var(--border);margin:24px 0;}
+
+/* FILE TYPE TAG */
+.file-tag{display:inline-flex;padding:2px 8px;background:var(--sand);border-radius:2px;font-size:8px;letter-spacing:1.5px;text-transform:uppercase;color:var(--grey);}
+
+@media(max-width:768px){
+  .sidebar{transform:translateX(-100%);}
+  .main{margin-left:0;}
+}
 </style>
 </head>
 <body>
-<nav>
-  <div class="nav-logo">NALU BY MONACO</div>
-  <div class="nav-item active" onclick="showSection('buyers')">BUYERS</div>
-  <div class="nav-item" onclick="showSection('properties')">PROPERTIES</div>
-  <div class="nav-item" onclick="showSection('files')">FILES</div>
-  <div class="nav-item" onclick="showSection('activity')">ACTIVITY</div>
-  <div class="nav-item" onclick="showSection('settings')">SETTINGS</div>
-  <div class="nav-footer">
-    <div class="nav-admin" id="nav-admin-name"></div>
-    <div class="nav-logout" onclick="logout()">LOGOUT</div>
+<!-- SIDEBAR -->
+<nav class="sidebar">
+  <div class="sidebar-brand">
+    <div class="sidebar-brand-name">Nalu by Monaco</div>
+    <div class="sidebar-brand-sub">Admin Portal</div>
+  </div>
+  <div class="sidebar-nav">
+    <a class="nav-item active" data-panel="buyers" onclick="showPanel('buyers');return false;" href="#">Buyers</a>
+    <a class="nav-item" data-panel="properties" onclick="showPanel('properties');return false;" href="#">Properties</a>
+    <a class="nav-item" data-panel="files" onclick="showPanel('files');return false;" href="#">Files</a>
+    <a class="nav-item" data-panel="activity" onclick="showPanel('activity');return false;" href="#">Activity</a>
+    <a class="nav-item" data-panel="settings" onclick="showPanel('settings');return false;" href="#">Settings</a>
+  </div>
+  <div class="sidebar-footer">
+    <button class="logout-btn" onclick="logout()">Sign Out</button>
   </div>
 </nav>
-<main>
 
-<!-- BUYERS -->
-<div id="section-buyers" class="section active">
-  <h2>Manage Buyers</h2><p class="sub">Add and manage buyer accounts</p><hr>
-  <div id="buyers-alert"></div>
-  <button class="btn" onclick="showAddBuyerModal()" style="margin-bottom:24px;">+ ADD BUYER</button>
-  <table>
-    <tr><th>NAME</th><th>EMAIL</th><th>LAST VISITED</th><th>ACTIVITY</th><th>ACTIONS</th></tr>
-    <tbody id="buyers-table"></tbody>
-  </table>
-</div>
+<!-- MAIN -->
+<div class="main">
 
-<!-- PROPERTIES -->
-<div id="section-properties" class="section">
-  <h2>Manage Properties</h2><p class="sub">Add properties and assign them to buyers</p><hr>
-  <div id="props-alert"></div>
-  <button class="btn" onclick="showAddPropertyModal()" style="margin-bottom:24px;">+ ADD PROPERTY</button>
-  <table>
-    <tr><th>NAME</th><th>ADDRESS</th><th>PRICE</th><th>AGENT</th><th>FILES</th><th>ACTIONS</th></tr>
-    <tbody id="properties-table"></tbody>
-  </table>
-</div>
-
-<!-- FILES -->
-<div id="section-files" class="section">
-  <h2>Manage Files</h2><p class="sub">Add Dropbox links or upload files for properties</p><hr>
-  <div id="files-alert"></div>
-  <div class="form-group"><label>SELECT PROPERTY</label>
-    <select id="files-property-select" onchange="loadPropertyFiles()"><option value="">Choose a property...</option></select>
-  </div>
-  <div id="files-container"></div>
-  <div id="add-file-form" style="display:none;margin-top:24px;background:#111;border:1px solid #1a1a1a;padding:24px;">
-    <h3 style="font-size:16px;font-weight:normal;margin-bottom:20px;color:#c9a84c;">ADD FILE / LINK</h3>
-    <div class="tab-row">
-      <div class="tab active" onclick="switchFileTab('url')">DROPBOX / URL</div>
-      <div class="tab" onclick="switchFileTab('upload')">UPLOAD FILE</div>
+  <!-- BUYERS PANEL -->
+  <div id="panel-buyers" class="panel-page active">
+    <div class="topbar">
+      <div>
+        <div class="page-title">Manage Buyers</div>
+        <div class="page-sub">Add and manage buyer accounts</div>
+      </div>
+      <button class="btn btn-primary" onclick="openModal('addBuyerModal')">+ Add Buyer</button>
     </div>
-    <div id="file-tab-url">
-      <div class="form-group"><label>FILE NAME</label><input type="text" id="file-url-name" placeholder="e.g. Floor Plan"></div>
-      <div class="form-group"><label>FILE TYPE</label><select id="file-url-type"><option value="document">Document (PDF)</option><option value="image">Image (Render/Photo)</option></select></div>
-      <div class="form-group"><label>DROPBOX / EXTERNAL URL</label><input type="url" id="file-url-link" placeholder="https://www.dropbox.com/s/..."></div>
-      <button class="btn btn-sm" onclick="addFileByUrl()">ADD LINK</button>
-    </div>
-    <div id="file-tab-upload" style="display:none;">
-      <div class="form-group"><label>FILE NAME (optional)</label><input type="text" id="file-upload-name" placeholder="Leave blank to use filename"></div>
-      <div class="form-group"><label>FILE TYPE</label><select id="file-upload-type"><option value="document">Document (PDF)</option><option value="image">Image (Render/Photo)</option></select></div>
-      <div class="form-group"><label>CHOOSE FILE</label><input type="file" id="file-upload-input"></div>
-      <button class="btn btn-sm" onclick="uploadFile()">UPLOAD</button>
+    <div class="content">
+      <div class="stats-grid" id="buyerStats">
+        <div class="stat-card"><div class="stat-label">Total Buyers</div><div class="stat-value" id="statBuyers">—</div></div>
+        <div class="stat-card"><div class="stat-label">Properties</div><div class="stat-value" id="statProperties">—</div></div>
+        <div class="stat-card"><div class="stat-label">Files</div><div class="stat-value" id="statFiles">—</div></div>
+        <div class="stat-card"><div class="stat-label">Portal Views</div><div class="stat-value" id="statViews">—</div></div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr>
+            <th>Name</th><th>Email</th><th>Last Visited</th><th>Activity</th><th>Actions</th>
+          </tr></thead>
+          <tbody id="buyersTable"><tr class="empty-row"><td colspan="5">No buyers yet. Add your first buyer above.</td></tr></tbody>
+        </table>
+      </div>
     </div>
   </div>
-</div>
 
-<!-- ACTIVITY -->
-<div id="section-activity" class="section">
-  <h2>Activity Timeline</h2><p class="sub">Track buyer engagement</p><hr>
-  <div class="form-group"><label>FILTER BY BUYER</label>
-    <select id="activity-buyer-select" onchange="loadActivity()"><option value="">All Buyers</option></select>
+  <!-- PROPERTIES PANEL -->
+  <div id="panel-properties" class="panel-page">
+    <div class="topbar">
+      <div>
+        <div class="page-title">Properties</div>
+        <div class="page-sub">Manage property listings</div>
+      </div>
+      <button class="btn btn-primary" onclick="openModal('addPropertyModal')">+ Add Property</button>
+    </div>
+    <div class="content">
+      <div class="table-wrap">
+        <table>
+          <thead><tr>
+            <th>Property</th><th>Type</th><th>Address</th><th>Assigned Buyers</th><th>Actions</th>
+          </tr></thead>
+          <tbody id="propertiesTable"><tr class="empty-row"><td colspan="5">No properties yet.</td></tr></tbody>
+        </table>
+      </div>
+    </div>
   </div>
-  <div id="activity-container"></div>
-</div>
 
-<!-- SETTINGS -->
-<div id="section-settings" class="section">
-  <h2>Settings</h2><p class="sub">Manage admin accounts</p><hr>
-  <div id="settings-alert"></div>
-  <button class="btn" onclick="showAddAdminModal()" style="margin-bottom:24px;">+ ADD ADMIN</button>
-  <table><tr><th>USERNAME</th><th>DISPLAY NAME</th><th>PHONE</th><th>CREATED</th></tr>
-    <tbody id="admins-table"></tbody>
-  </table>
-</div>
+  <!-- FILES PANEL -->
+  <div id="panel-files" class="panel-page">
+    <div class="topbar">
+      <div>
+        <div class="page-title">Files & Documents</div>
+        <div class="page-sub">Upload files or add Dropbox links</div>
+      </div>
+      <button class="btn btn-primary" onclick="openModal('addFileModal')">+ Add File</button>
+    </div>
+    <div class="content">
+      <div class="table-wrap">
+        <table>
+          <thead><tr>
+            <th>Name</th><th>Property</th><th>Type</th><th>Source</th><th>Actions</th>
+          </tr></thead>
+          <tbody id="filesTable"><tr class="empty-row"><td colspan="5">No files yet.</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
 
-</main>
+  <!-- ACTIVITY PANEL -->
+  <div id="panel-activity" class="panel-page">
+    <div class="topbar">
+      <div>
+        <div class="page-title">Activity</div>
+        <div class="page-sub">Recent portal access and events</div>
+      </div>
+    </div>
+    <div class="content">
+      <div class="table-wrap activity-list" id="activityList">
+        <div class="activity-item"><span class="activity-dot"></span><span class="activity-text" style="color:var(--grey)">No activity yet.</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SETTINGS PANEL -->
+  <div id="panel-settings" class="panel-page">
+    <div class="topbar">
+      <div>
+        <div class="page-title">Settings</div>
+        <div class="page-sub">Portal configuration and admin access</div>
+      </div>
+    </div>
+    <div class="content">
+      <div class="settings-section">
+        <div class="settings-section-title">Agent Information</div>
+        <div class="card">
+          <form id="agentForm" onsubmit="saveAgentSettings(event)">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+              <div class="form-group">
+                <label class="form-label">Display Name</label>
+                <input class="form-input" id="agentName" type="text" placeholder="Your Name">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Title</label>
+                <input class="form-input" id="agentTitle" type="text" placeholder="Sales Agent">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Phone</label>
+                <input class="form-input" id="agentPhone" type="text" placeholder="+61 4XX XXX XXX">
+              </div>
+              <div class="form-group">
+                <label class="form-label">WhatsApp Number</label>
+                <input class="form-input" id="agentWhatsapp" type="text" placeholder="61412345678">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Email</label>
+                <input class="form-input" id="agentEmail" type="email" placeholder="agent@nalubymonaco.com.au">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Photo URL</label>
+                <input class="form-input" id="agentPhoto" type="text" placeholder="https://...">
+              </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Save Agent Details</button>
+          </form>
+        </div>
+      </div>
+      <div class="settings-section">
+        <div class="settings-section-title">Add Administrator</div>
+        <div class="card">
+          <form id="addAdminForm" onsubmit="addAdmin(event)">
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px">
+              <div class="form-group">
+                <label class="form-label">Username</label>
+                <input class="form-input" id="newAdminUser" type="text" placeholder="username" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Password</label>
+                <input class="form-input" id="newAdminPass" type="password" placeholder="••••••••" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Display Name</label>
+                <input class="form-input" id="newAdminName" type="text" placeholder="Your Name">
+              </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Add Administrator</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- end .main -->
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
 
 <!-- MODALS -->
-<div id="modal-overlay" style="display:none;" class="modal-overlay" onclick="closeModal(event)">
-  <div id="modal-content" class="modal" onclick="event.stopPropagation()"></div>
+
+<!-- Add Buyer Modal -->
+<div class="modal-backdrop" id="addBuyerModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Add Buyer</div>
+      <button class="modal-close" onclick="closeModal('addBuyerModal')">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group"><label class="form-label">Full Name</label><input class="form-input" id="buyerName" type="text" placeholder="John Smith" required></div>
+      <div class="form-group"><label class="form-label">Email Address</label><input class="form-input" id="buyerEmail" type="email" placeholder="john@example.com" required></div>
+      <div class="form-group">
+        <label class="form-label">Assign Properties</label>
+        <div class="checkbox-list" id="buyerPropertyList"><div style="padding:12px;font-size:12px;color:var(--grey)">No properties yet. Add properties first.</div></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('addBuyerModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="addBuyer()">Add Buyer</button>
+    </div>
+  </div>
 </div>
 
-<script>
-let adminToken='';
-let allBuyers=[];
-let allProperties=[];
-let allAdmins=[];
-let currentFilePropertyId=null;
+<!-- View Buyer Modal -->
+<div class="modal-backdrop" id="viewBuyerModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="viewBuyerName">Buyer Details</div>
+      <button class="modal-close" onclick="closeModal('viewBuyerModal')">&times;</button>
+    </div>
+    <div class="modal-body" id="viewBuyerBody">
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('viewBuyerModal')">Close</button>
+    </div>
+  </div>
+</div>
 
-// Init
-(async()=>{
-  const r=await fetch('/api/admin/me',{credentials:'include'});
-  if(!r.ok){window.location.href='/admin/login';return;}
-  const a=await r.json();
-  adminToken='session';
-  document.getElementById('nav-admin-name').textContent=a.display_name;
-  await Promise.all([loadBuyers(),loadProperties(),loadAdmins()]);
-})();
+<!-- Add Property Modal -->
+<div class="modal-backdrop" id="addPropertyModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Add Property</div>
+      <button class="modal-close" onclick="closeModal('addPropertyModal')">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group"><label class="form-label">Property Name</label><input class="form-input" id="propName" type="text" placeholder="e.g. Residence 4B" required></div>
+      <div class="form-group">
+        <label class="form-label">Type</label>
+        <select class="form-input" id="propType">
+          <option value="Residential">Residential</option>
+          <option value="Penthouse">Penthouse</option>
+          <option value="Beachfront">Beachfront</option>
+          <option value="Land">Land</option>
+          <option value="Commercial">Commercial</option>
+        </select>
+      </div>
+      <div class="form-group"><label class="form-label">Address</label><input class="form-input" id="propAddress" type="text" placeholder="123 Ocean Drive, Gold Coast QLD 4217"></div>
+      <div class="form-group"><label class="form-label">Thumbnail URL <span style="color:var(--grey-light);font-size:10px">(optional)</span></label><input class="form-input" id="propThumb" type="text" placeholder="https://nalubymonaco.com.au/images/..."></div>
+      <div class="form-group">
+        <label class="form-label">Description</label>
+        <textarea class="form-input" id="propDesc" placeholder="Brief property description..."></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('addPropertyModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="addProperty()">Add Property</button>
+    </div>
+  </div>
+</div>
 
-function authHeaders(){return{'Content-Type':'application/json'};}
+<!-- Add File Modal -->
+<div class="modal-backdrop" id="addFileModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Add File</div>
+      <button class="modal-close" onclick="closeModal('addFileModal')">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Property</label>
+        <select class="form-input" id="fileProperty"><option value="">Select a property...</option></select>
+      </div>
+      <div class="form-group"><label class="form-label">File Name</label><input class="form-input" id="fileName" type="text" placeholder="e.g. Floor Plan Level 4" required></div>
+      <div class="form-group">
+        <label class="form-label">File Type</label>
+        <select class="form-input" id="fileType">
+          <option value="document">Document</option>
+          <option value="image">Image / Render</option>
+        </select>
+      </div>
+      <div class="divider-line"></div>
+      <div class="form-group">
+        <label class="form-label">Dropbox / External URL</label>
+        <input class="form-input" id="fileUrl" type="text" placeholder="https://www.dropbox.com/...">
+        <div style="font-size:11px;color:var(--grey);margin-top:6px">Paste a Dropbox share link or any external URL. Buyers will be taken directly to the file.</div>
+      </div>
+      <div style="text-align:center;font-size:11px;color:var(--grey-light);margin:16px 0">— or upload a file —</div>
+      <div class="upload-zone" id="uploadZone" onclick="document.getElementById('fileInput').click()">
+        <input type="file" id="fileInput" style="display:none" accept=".pdf,.jpg,.jpeg,.png,.webp,.gif" onchange="handleFileSelect(this)">
+        <div class="upload-zone-title">Click to upload</div>
+        <div class="upload-zone-sub">PDF, JPG, PNG, WEBP &mdash; max 50MB</div>
+      </div>
+      <div id="filePreview" style="display:none;margin-top:12px;padding:10px 14px;background:var(--sand-light);border-radius:2px;font-size:12px;color:var(--charcoal)"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('addFileModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="addFile()">Add File</button>
+    </div>
+  </div>
+</div>
 
-async function logout(){
-  await fetch('/api/admin/logout',{method:'POST',credentials:'include'});
-  window.location.href='/admin/login';
+<!-- Send Link Modal -->
+<div class="modal-backdrop" id="sendLinkModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Send Access Link</div>
+      <button class="modal-close" onclick="closeModal('sendLinkModal')">&times;</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:13px;color:var(--grey);margin-bottom:20px">This will send a secure access link to the buyer&#39;s portal. The link expires in 24 hours.</p>
+      <div class="form-group">
+        <label class="form-label">Buyer</label>
+        <div id="sendLinkBuyerName" style="font-size:15px;color:var(--charcoal);padding:11px 14px;background:var(--sand-light);border-radius:2px;border:1px solid var(--border)"></div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Email</label>
+        <div id="sendLinkBuyerEmail" style="font-size:13px;color:var(--grey);padding:11px 14px;background:var(--sand-light);border-radius:2px;border:1px solid var(--border)"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('sendLinkModal')">Cancel</button>
+      <button class="btn btn-primary" id="sendLinkBtn" onclick="sendAccessLink()">Send Link</button>
+    </div>
+  </div>
+</div><script>
+let buyers=[],properties=[],files=[],activity=[],currentSendBuyer=null,selectedFile=null;
+document.addEventListener('DOMContentLoaded',()=>{loadAll();});
+async function loadAll(){await Promise.all([loadBuyers(),loadProperties(),loadFiles(),loadActivity()]);updateStats();}
+function showPanel(name){
+  document.querySelectorAll('.panel-page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('panel-'+name).classList.add('active');
+  document.querySelector('[data-panel="'+name+'"]').classList.add('active');
+  if(name==='buyers')loadBuyers();if(name==='properties')loadProperties();
+  if(name==='files')loadFiles();if(name==='activity')loadActivity();
 }
-
-function showSection(name){
-  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach(i=>i.classList.remove('active'));
-  document.getElementById('section-'+name).classList.add('active');
-  document.querySelectorAll('.nav-item').forEach(i=>{if(i.textContent.toLowerCase()===name)i.classList.add('active');});
-  if(name==='files')populateFilesPropertySelect();
-  if(name==='activity'){populateActivityBuyerSelect();loadActivity();}
-}
-
-function showAlert(containerId,msg,type='success'){
-  document.getElementById(containerId).innerHTML='<div class="alert '+type+'">'+msg+'</div>';
-  setTimeout(()=>{document.getElementById(containerId).innerHTML='';},4000);
-}
-
-function openModal(html){
-  document.getElementById('modal-content').innerHTML=html;
-  document.getElementById('modal-overlay').style.display='flex';
-}
-function closeModal(e){
-  if(!e||e.target===document.getElementById('modal-overlay'))document.getElementById('modal-overlay').style.display='none';
-}
-
-// BUYERS
-async function loadBuyers(){
-  const r=await fetch('/api/admin/buyers',{credentials:'include'});
-  allBuyers=await r.json();
-  renderBuyers();
-}
-
-function renderBuyers(){
-  const tb=document.getElementById('buyers-table');
-  if(!allBuyers.length){tb.innerHTML='<tr><td colspan="5" style="color:#444;text-align:center;padding:40px;">No buyers yet. Add your first buyer.</td></tr>';return;}
-  tb.innerHTML=allBuyers.map(b=>'<tr><td>'+b.name+'</td><td style="color:#888;">'+b.email+'</td><td style="color:#666;font-size:12px;">'+(b.last_visited?new Date(b.last_visited).toLocaleDateString('en-AU'):'Never')+'</td><td><span class="badge">'+b.activity_count+' events</span></td><td style="display:flex;gap:6px;flex-wrap:wrap;padding:10px 16px;"><button class="btn btn-sm btn-outline" onclick="sendLink('+b.id+')">SEND LINK</button><button class="btn btn-sm btn-outline" onclick="copyPortalLink('+b.id+')">PORTAL LINK</button><button class="btn btn-sm btn-outline" onclick="showAssignProps('+b.id+',''+b.name+'')">PROPERTIES</button><button class="btn btn-sm btn-danger" onclick="deleteBuyer('+b.id+',''+b.name+'')">DELETE</button></td></tr>').join('');
-}
-
-function showAddBuyerModal(){
-  openModal('<h3>ADD BUYER</h3><div class="form-group"><label>FULL NAME</label><input id="m-name" type="text"></div><div class="form-group"><label>EMAIL ADDRESS</label><input id="m-email" type="email"></div><div class="form-group"><label>PHONE (optional)</label><input id="m-phone" type="tel"></div><div class="modal-btns"><button class="btn" onclick="addBuyer()">ADD BUYER</button><button class="btn btn-outline" onclick="closeModal()">CANCEL</button></div><div id="m-err" style="margin-top:12px;"></div>');
-}
-
-async function addBuyer(){
-  const name=document.getElementById('m-name').value;
-  const email=document.getElementById('m-email').value;
-  const phone=document.getElementById('m-phone').value;
-  if(!name||!email){document.getElementById('m-err').innerHTML='<div class="alert error">Name and email required.</div>';return;}
-  const r=await fetch('/api/admin/buyers',{method:'POST',headers:authHeaders(),body:JSON.stringify({name,email,phone}),credentials:'include'});
-  const d=await r.json();
-  if(d.success){closeModal();await loadBuyers();showAlert('buyers-alert','Buyer added successfully.');}
-  else{document.getElementById('m-err').innerHTML='<div class="alert error">'+(d.error||'Error')+'</div>';}
-}
-
-async function deleteBuyer(id,name){
-  if(!confirm('Delete buyer '+name+'? This will remove all their data.'))return;
-  await fetch('/api/admin/buyers/'+id,{method:'DELETE',credentials:'include'});
-  await loadBuyers();
-  showAlert('buyers-alert','Buyer deleted.');
-}
-
-async function sendLink(id){
-  const btn=event.target;btn.textContent='SENDING...';btn.disabled=true;
-  const r=await fetch('/api/admin/buyers/'+id+'/send-link',{method:'POST',credentials:'include'});
-  const d=await r.json();
-  btn.textContent='SEND LINK';btn.disabled=false;
-  if(d.success){
-    openModal('<h3>LINK SENT</h3><p style="color:#888;margin-bottom:16px;">Magic link sent (or generated if email not configured):</p><div class="link-box">'+d.url+'</div><div class="modal-btns"><button class="btn btn-sm" onclick="navigator.clipboard.writeText(''+d.url+'').then(()=>alert('Copied!'))">COPY LINK</button><button class="btn btn-outline btn-sm" onclick="closeModal()">CLOSE</button></div>');
-  }
-}
-
-async function copyPortalLink(id){
-  const r=await fetch('/api/admin/buyers/'+id+'/portal-link',{credentials:'include'});
-  const d=await r.json();
-  openModal('<h3>DIRECT PORTAL LINK</h3><p style="color:#888;margin-bottom:16px;">This link gives permanent access without email verification:</p><div class="link-box">'+d.url+'</div><div class="modal-btns"><button class="btn btn-sm" onclick="navigator.clipboard.writeText(''+d.url+'').then(()=>alert('Copied!'))">COPY LINK</button><button class="btn btn-outline btn-sm" onclick="closeModal()">CLOSE</button></div>');
-}
-
-async function showAssignProps(buyerId,buyerName){
-  const r=await fetch('/api/admin/buyers/'+buyerId+'/properties',{credentials:'include'});
-  const assigned=await r.json();
-  const checks=allProperties.map(p=>'<div class="prop-checkbox"><input type="checkbox" id="prop-'+p.id+'" value="'+p.id+'"'+(assigned.includes(p.id)?' checked':'')+'><label for="prop-'+p.id+'" style="color:#fff;letter-spacing:0;font-size:13px;cursor:pointer;">'+p.name+'<span style="color:#555;font-size:11px;display:block;">'+p.address+'</span></label></div>').join('');
-  openModal('<h3>ASSIGN PROPERTIES TO '+buyerName.toUpperCase()+'</h3>'+checks+'<div class="modal-btns"><button class="btn" onclick="saveAssignedProps('+buyerId+')">SAVE</button><button class="btn btn-outline" onclick="closeModal()">CANCEL</button></div>');
-}
-
-async function saveAssignedProps(buyerId){
-  const checked=Array.from(document.querySelectorAll('.prop-checkbox input:checked')).map(el=>parseInt(el.value));
-  const r=await fetch('/api/admin/buyers/'+buyerId+'/properties',{credentials:'include'});
-  const current=await r.json();
-  for(const id of allProperties.map(p=>p.id)){
-    if(checked.includes(id)&&!current.includes(id)){await fetch('/api/admin/buyers/'+buyerId+'/properties/'+id,{method:'POST',credentials:'include'});}
-    if(!checked.includes(id)&&current.includes(id)){await fetch('/api/admin/buyers/'+buyerId+'/properties/'+id,{method:'DELETE',credentials:'include'});}
-  }
-  closeModal();showAlert('buyers-alert','Properties updated.');
-}
-
-// PROPERTIES
-async function loadProperties(){
-  const r=await fetch('/api/admin/properties',{credentials:'include'});
-  allProperties=await r.json();
-  renderProperties();
-}
-
-function renderProperties(){
-  const tb=document.getElementById('properties-table');
-  if(!allProperties.length){tb.innerHTML='<tr><td colspan="6" style="color:#444;text-align:center;padding:40px;">No properties yet.</td></tr>';return;}
-  tb.innerHTML=allProperties.map(p=>'<tr><td>'+p.name+'</td><td style="color:#888;font-size:12px;">'+p.address+'</td><td style="color:#c9a84c;">'+(p.price||'-')+'</td><td style="color:#666;font-size:12px;">'+(p.agent_name||'-')+'</td><td><span class="badge">'+p.file_count+' files</span></td><td style="display:flex;gap:6px;padding:10px 16px;"><button class="btn btn-sm btn-outline" onclick="showEditProperty('+p.id+')">EDIT</button><button class="btn btn-sm btn-danger" onclick="deleteProperty('+p.id+',''+p.name+'')">DELETE</button></td></tr>').join('');
-}
-
-function showAddPropertyModal(){
-  const agentOpts=allAdmins.map(a=>'<option value="'+a.id+'">'+a.display_name+'</option>').join('');
-  openModal('<h3>ADD PROPERTY</h3><div class="form-group"><label>PROPERTY NAME</label><input id="pm-name" type="text" placeholder="e.g. Surfers Paradise Penthouse"></div><div class="form-group"><label>ADDRESS</label><input id="pm-addr" type="text"></div><div class="form-group"><label>PRICE</label><input id="pm-price" type="text" placeholder="e.g. $2,500,000"></div><div class="form-group"><label>AVAILABILITY</label><input id="pm-avail" type="text" placeholder="e.g. Q4 2025 or Available Now"></div><div class="form-group"><label>AGENT</label><select id="pm-agent">'+agentOpts+'</select></div><div class="modal-btns"><button class="btn" onclick="addProperty()">ADD PROPERTY</button><button class="btn btn-outline" onclick="closeModal()">CANCEL</button></div><div id="pm-err"></div>');
-}
-
-async function addProperty(){
-  const name=document.getElementById('pm-name').value;
-  const address=document.getElementById('pm-addr').value;
-  const price=document.getElementById('pm-price').value;
-  const availability=document.getElementById('pm-avail').value;
-  const agent_id=document.getElementById('pm-agent').value;
-  if(!name||!address){document.getElementById('pm-err').innerHTML='<div class="alert error">Name and address required.</div>';return;}
-  const r=await fetch('/api/admin/properties',{method:'POST',headers:authHeaders(),body:JSON.stringify({name,address,price,availability,agent_id}),credentials:'include'});
-  const d=await r.json();
-  if(d.success){closeModal();await loadProperties();showAlert('props-alert','Property added.');}
-  else{document.getElementById('pm-err').innerHTML='<div class="alert error">'+(d.error||'Error')+'</div>';}
-}
-
-async function showEditProperty(id){
-  const p=allProperties.find(x=>x.id===id);
-  const agentOpts=allAdmins.map(a=>'<option value="'+a.id+'"'+(a.id===p.agent_id?' selected':'')+'>'+a.display_name+'</option>').join('');
-  openModal('<h3>EDIT PROPERTY</h3><div class="form-group"><label>NAME</label><input id="pm-name" value="'+p.name+'"></div><div class="form-group"><label>ADDRESS</label><input id="pm-addr" value="'+p.address+'"></div><div class="form-group"><label>PRICE</label><input id="pm-price" value="'+(p.price||'')+'"></div><div class="form-group"><label>AVAILABILITY</label><input id="pm-avail" value="'+(p.availability||'')+'"></div><div class="form-group"><label>AGENT</label><select id="pm-agent">'+agentOpts+'</select></div><div class="modal-btns"><button class="btn" onclick="editProperty('+id+')">SAVE</button><button class="btn btn-outline" onclick="closeModal()">CANCEL</button></div>');
-}
-
-async function editProperty(id){
-  const name=document.getElementById('pm-name').value;
-  const address=document.getElementById('pm-addr').value;
-  const price=document.getElementById('pm-price').value;
-  const availability=document.getElementById('pm-avail').value;
-  const agent_id=document.getElementById('pm-agent').value;
-  await fetch('/api/admin/properties/'+id,{method:'PUT',headers:authHeaders(),body:JSON.stringify({name,address,price,availability,agent_id}),credentials:'include'});
-  closeModal();await loadProperties();showAlert('props-alert','Property updated.');
-}
-
-async function deleteProperty(id,name){
-  if(!confirm('Delete property "'+name+'"? All associated files will be removed.'))return;
-  await fetch('/api/admin/properties/'+id,{method:'DELETE',credentials:'include'});
-  await loadProperties();showAlert('props-alert','Property deleted.');
-}
-
-// FILES
-function populateFilesPropertySelect(){
-  const sel=document.getElementById('files-property-select');
-  sel.innerHTML='<option value="">Choose a property...</option>'+allProperties.map(p=>'<option value="'+p.id+'">'+p.name+'</option>').join('');
-  document.getElementById('files-container').innerHTML='';
-  document.getElementById('add-file-form').style.display='none';
-}
-
-async function loadPropertyFiles(){
-  const propId=document.getElementById('files-property-select').value;
-  if(!propId){document.getElementById('files-container').innerHTML='';document.getElementById('add-file-form').style.display='none';return;}
-  currentFilePropertyId=propId;
-  const r=await fetch('/api/admin/properties/'+propId+'/files',{credentials:'include'});
-  const files=await r.json();
-  document.getElementById('add-file-form').style.display='block';
-  if(!files.length){document.getElementById('files-container').innerHTML='<p style="color:#444;margin-bottom:16px;">No files yet. Add a Dropbox link or upload a file below.</p>';return;}
-  document.getElementById('files-container').innerHTML='<div style="margin-bottom:24px;">'+files.map(f=>'<div class="file-row"><div class="file-row-info"><span>'+(f.type==='image'?'📷':'📄')+'</span><div><div>'+f.name+'</div><div style="color:#666;font-size:11px;font-family:monospace;">'+f.url.substring(0,60)+(f.url.length>60?'...':'')+'</div></div></div><button class="btn btn-sm btn-danger" onclick="deleteFile('+f.id+')">REMOVE</button></div>').join('')+'</div>';
-}
-
-function switchFileTab(tab){
-  document.querySelectorAll('.tab-row .tab').forEach(t=>t.classList.remove('active'));
-  event.target.classList.add('active');
-  document.getElementById('file-tab-url').style.display=tab==='url'?'block':'none';
-  document.getElementById('file-tab-upload').style.display=tab==='upload'?'block':'none';
-}
-
-async function addFileByUrl(){
-  const name=document.getElementById('file-url-name').value;
-  const type=document.getElementById('file-url-type').value;
-  const url=document.getElementById('file-url-link').value;
-  if(!name||!url){showAlert('files-alert','Name and URL required.','error');return;}
-  const r=await fetch('/api/admin/files',{method:'POST',headers:authHeaders(),body:JSON.stringify({property_id:currentFilePropertyId,name,type,url}),credentials:'include'});
-  const d=await r.json();
-  if(d.success){document.getElementById('file-url-name').value='';document.getElementById('file-url-link').value='';await loadPropertyFiles();showAlert('files-alert','File link added.');}
-  else{showAlert('files-alert',d.error||'Error','error');}
-}
-
-async function uploadFile(){
-  const fileInput=document.getElementById('file-upload-input');
-  if(!fileInput.files[0]){showAlert('files-alert','Please select a file.','error');return;}
-  const fd=new FormData();
-  fd.append('file',fileInput.files[0]);
-  fd.append('property_id',currentFilePropertyId);
-  fd.append('name',document.getElementById('file-upload-name').value);
-  fd.append('type',document.getElementById('file-upload-type').value);
-  const r=await fetch('/api/admin/files/upload',{method:'POST',body:fd,credentials:'include'});
-  const d=await r.json();
-  if(d.success){fileInput.value='';document.getElementById('file-upload-name').value='';await loadPropertyFiles();showAlert('files-alert','File uploaded.');}
-  else{showAlert('files-alert',d.error||'Error','error');}
-}
-
-async function deleteFile(id){
-  if(!confirm('Remove this file?'))return;
-  await fetch('/api/admin/files/'+id,{method:'DELETE',credentials:'include'});
-  await loadPropertyFiles();showAlert('files-alert','File removed.');
-}
-
-// ACTIVITY
-function populateActivityBuyerSelect(){
-  const sel=document.getElementById('activity-buyer-select');
-  sel.innerHTML='<option value="">All Buyers</option>'+allBuyers.map(b=>'<option value="'+b.id+'">'+b.name+'</option>').join('');
-}
-
-async function loadActivity(){
-  const buyerId=document.getElementById('activity-buyer-select').value;
-  const url='/api/admin/activity'+(buyerId?'?buyer_id='+buyerId:'');
-  const r=await fetch(url,{credentials:'include'});
-  const items=await r.json();
-  if(!items.length){document.getElementById('activity-container').innerHTML='<p style="color:#444;padding:40px 0;text-align:center;">No activity yet.</p>';return;}
-  document.getElementById('activity-container').innerHTML=items.map(i=>'<div class="activity-item"><div class="activity-dot"></div><div><div style="font-size:13px;">'+(i.buyer_name||'')+(i.action?' &mdash; '+i.action.replace(/_/g,' '):'')+'</div><div class="activity-time">'+new Date(i.created_at).toLocaleString('en-AU')+(i.detail?' &bull; '+i.detail:'')+'</div></div></div>').join('');
-}
-
-// SETTINGS / ADMINS
-async function loadAdmins(){
-  const r=await fetch('/api/admin/admins',{credentials:'include'});
-  allAdmins=await r.json();
-  const tb=document.getElementById('admins-table');
-  tb.innerHTML=allAdmins.map(a=>'<tr><td>'+a.username+'</td><td>'+a.display_name+'</td><td style="color:#888;">'+(a.phone||'-')+'</td><td style="color:#666;font-size:12px;">'+new Date(a.created_at).toLocaleDateString('en-AU')+'</td></tr>').join('');
-}
-
-function showAddAdminModal(){
-  openModal('<h3>ADD ADMIN USER</h3><div class="form-group"><label>USERNAME</label><input id="am-user" type="text"></div><div class="form-group"><label>PASSWORD</label><input id="am-pass" type="password"></div><div class="form-group"><label>DISPLAY NAME</label><input id="am-name" type="text"></div><div class="form-group"><label>PHONE</label><input id="am-phone" type="tel"></div><div class="form-group"><label>WHATSAPP NUMBER</label><input id="am-wa" type="tel" placeholder="e.g. 61412345678"></div><div class="modal-btns"><button class="btn" onclick="addAdmin()">ADD ADMIN</button><button class="btn btn-outline" onclick="closeModal()">CANCEL</button></div><div id="am-err"></div>');
-}
-
-async function addAdmin(){
-  const username=document.getElementById('am-user').value;
-  const password=document.getElementById('am-pass').value;
-  const display_name=document.getElementById('am-name').value;
-  const phone=document.getElementById('am-phone').value;
-  const whatsapp=document.getElementById('am-wa').value;
-  if(!username||!password||!display_name){document.getElementById('am-err').innerHTML='<div class="alert error">All required fields must be filled.</div>';return;}
-  const r=await fetch('/api/admin/admins',{method:'POST',headers:authHeaders(),body:JSON.stringify({username,password,display_name,phone,whatsapp}),credentials:'include'});
-  const d=await r.json();
-  if(d.success){closeModal();await loadAdmins();showAlert('settings-alert','Admin user created.');}
-  else{document.getElementById('am-err').innerHTML='<div class="alert error">'+(d.error||'Error')+'</div>';}
-}
+function toast(msg,err){var t=document.getElementById('toast');t.textContent=msg;t.className='toast'+(err?' error':'');setTimeout(()=>t.classList.add('show'),10);setTimeout(()=>t.classList.remove('show'),3000);}
+function openModal(id){document.getElementById(id).classList.add('open');}
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+document.addEventListener('click',function(e){if(e.target.classList.contains('modal-backdrop'))e.target.classList.remove('open');});
+async function logout(){await fetch('/api/admin/logout',{method:'POST'});window.location.href='/admin/login';}
+function updateStats(){document.getElementById('statBuyers').textContent=buyers.length;document.getElementById('statProperties').textContent=properties.length;document.getElementById('statFiles').textContent=files.length;document.getElementById('statViews').textContent=activity.filter(a=>a.action==='portal_view').length;}
+async function loadBuyers(){try{var r=await fetch('/api/admin/buyers',{credentials:'include'});if(r.status===401){window.location.href='/admin/login';return;}buyers=await r.json();renderBuyers();}catch(e){toast('Failed to load buyers',true);}}
+function renderBuyers(){var tbody=document.getElementById('buyersTable');if(!buyers.length){tbody.innerHTML='<tr class="empty-row"><td colspan="5">No buyers yet.</td></tr>';return;}
+tbody.innerHTML=buyers.map(function(b){
+var dv=b.last_visited?new Date(b.last_visited).toLocaleDateString('en-AU',{day:'numeric',month:'short',year:'numeric'}):'Never';
+return '<tr><td><strong>'+b.name+'</strong></td><td style="color:var(--grey)">'+b.email+'</td><td style="color:var(--grey-light);font-size:12px">'+dv+'</td><td><span class="badge '+(b.visit_count>0?'badge-sand':'badge-grey')+'">'+( b.visit_count||0)+' views</span></td><td><div class="table-actions"><button class="btn btn-outline btn-sm" onclick="viewBuyer('+b.id+')">View</button><button class="btn btn-sand btn-sm" onclick="openSendLink('+b.id+')">Send Link</button><button class="btn btn-danger btn-sm" onclick="deleteBuyer('+b.id+')">Delete</button></div></td></tr>';
+}).join('');}
+async function addBuyer(){var name=document.getElementById('buyerName').value.trim(),email=document.getElementById('buyerEmail').value.trim();if(!name||!email){toast('Name and email required',true);return;}var propIds=[...document.querySelectorAll('#buyerPropertyList input:checked')].map(c=>parseInt(c.value));try{var r=await fetch('/api/admin/buyers',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'include',body:JSON.stringify({name,email,property_ids:propIds})});var d=await r.json();if(r.ok){toast('Buyer added');closeModal('addBuyerModal');document.getElementById('buyerName').value='';document.getElementById('buyerEmail').value='';loadBuyers();updateStats();}else{toast(d.error||'Failed',true);}}catch(e){toast('Error',true);}}
+async function deleteBuyer(id){if(!confirm('Delete this buyer? This cannot be undone.'))return;try{await fetch('/api/admin/buyers/'+id,{method:'DELETE',credentials:'include'});toast('Buyer deleted');loadBuyers();updateStats();}catch(e){toast('Error',true);}}
+async function viewBuyer(id){var b=buyers.find(function(x){return x.id===id;});if(!b)return;var portalUrl=window.location.origin+'/portal/'+b.portal_token;document.getElementById('viewBuyerName').textContent=b.name;document.getElementById('viewBuyerBody').innerHTML='<div class="form-group"><label class="form-label">Email</label><div style="padding:11px 14px;background:var(--sand-light);border-radius:2px;border:1px solid var(--border);font-size:13px">'+b.email+'</div></div><div class="form-group"><label class="form-label">Portal Link</label><div style="display:flex;gap:8px;align-items:center"><input class="form-input" type="text" value="'+portalUrl+'" readonly onclick="this.select()" style="font-size:11px;color:var(--grey)"><button class="btn btn-outline btn-sm" onclick="navigator.clipboard.writeText(\'' + ''+portalUrl+'\' + '');toast(\'' + 'Copied!\'' + '')">Copy</button></div></div><div class="form-group"><label class="form-label">Last Visited</label><div style="padding:11px 14px;background:var(--sand-light);border-radius:2px;border:1px solid var(--border);font-size:13px;color:var(--grey)">'+( b.last_visited?new Date(b.last_visited).toLocaleString('en-AU'):'Never')+' </div></div>';openModal('viewBuyerModal');}
+function openSendLink(id){var b=buyers.find(function(x){return x.id===id;});if(!b)return;currentSendBuyer=b;document.getElementById('sendLinkBuyerName').textContent=b.name;document.getElementById('sendLinkBuyerEmail').textContent=b.email;openModal('sendLinkModal');}
+async function sendAccessLink(){if(!currentSendBuyer)return;var btn=document.getElementById('sendLinkBtn');btn.textContent='Sending...';btn.disabled=true;try{var r=await fetch('/api/admin/send-link',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'include',body:JSON.stringify({buyer_id:currentSendBuyer.id})});var d=await r.json();if(r.ok){toast('Access link sent to '+currentSendBuyer.email);}else{toast(d.error||'Failed',true);}}catch(e){toast('Error',true);}btn.textContent='Send Link';btn.disabled=false;closeModal('sendLinkModal');}
+async function loadProperties(){try{var r=await fetch('/api/admin/properties',{credentials:'include'});properties=await r.json();renderProperties();populatePropertyDropdowns();}catch(e){}}
+function renderProperties(){var tbody=document.getElementById('propertiesTable');if(!properties.length){tbody.innerHTML='<tr class="empty-row"><td colspan="5">No properties yet.</td></tr>';return;}tbody.innerHTML=properties.map(function(p){return '<tr><td><strong>'+p.name+'</strong></td><td><span class="badge badge-grey">'+(p.type||'Residential')+'</span></td><td style="color:var(--grey);font-size:12px">'+(p.address||'-')+'</td><td style="color:var(--grey-light);font-size:12px">'+(p.buyer_count||0)+' buyer(s)</td><td><div class="table-actions"><button class="btn btn-danger btn-sm" onclick="deleteProperty('+p.id+')">Delete</button></div></td></tr>';}).join('');}
+async function addProperty(){var name=document.getElementById('propName').value.trim(),type=document.getElementById('propType').value,address=document.getElementById('propAddress').value.trim(),thumbnail_url=document.getElementById('propThumb').value.trim(),description=document.getElementById('propDesc').value.trim();if(!name){toast('Property name required',true);return;}try{var r=await fetch('/api/admin/properties',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'include',body:JSON.stringify({name,type,address,thumbnail_url,description})});var d=await r.json();if(r.ok){toast('Property added');closeModal('addPropertyModal');['propName','propAddress','propThumb','propDesc'].forEach(function(id){document.getElementById(id).value='';});loadProperties();updateStats();}else{toast(d.error||'Failed',true);}}catch(e){toast('Error',true);}}
+async function deleteProperty(id){if(!confirm('Delete this property?'))return;await fetch('/api/admin/properties/'+id,{method:'DELETE',credentials:'include'});toast('Property deleted');loadProperties();updateStats();}
+function populatePropertyDropdowns(){var buyerList=document.getElementById('buyerPropertyList');if(properties.length){buyerList.innerHTML=properties.map(function(p){return '<div class="checkbox-item"><input type="checkbox" id="bprop'+p.id+'" value="'+p.id+'"><label for="bprop'+p.id+'">'+p.name+'</label></div>';}).join('');}else{buyerList.innerHTML='<div style="padding:12px;font-size:12px;color:var(--grey)">No properties yet.</div>';}var fileSelect=document.getElementById('fileProperty');fileSelect.innerHTML='<option value="">Select property...</option>'+properties.map(function(p){return '<option value="'+p.id+'">'+p.name+'</option>';}).join('');}
+async function loadFiles(){try{var r=await fetch('/api/admin/files',{credentials:'include'});files=await r.json();renderFiles();}catch(e){}}
+function renderFiles(){var tbody=document.getElementById('filesTable');if(!files.length){tbody.innerHTML='<tr class="empty-row"><td colspan="5">No files yet.</td></tr>';return;}tbody.innerHTML=files.map(function(f){var viewBtn=(f.file_url||f.url)?'<a class="btn btn-outline btn-sm" href="'+(f.file_url||f.url)+'" target="_blank">View</a>':'';return '<tr><td><strong>'+(f.name||f.file_name)+'</strong></td><td style="color:var(--grey)">'+(f.property_name||'-')+'</td><td><span class="file-tag">'+(f.file_type||'doc')+'</span></td><td style="font-size:11px;color:var(--grey-light)">'+(f.file_url?'Link':'Upload')+'</td><td><div class="table-actions">'+viewBtn+'<button class="btn btn-danger btn-sm" onclick="deleteFile('+f.id+')">Delete</button></div></td></tr>';}).join('');}
+function handleFileSelect(input){selectedFile=input.files[0];if(selectedFile){document.getElementById('filePreview').style.display='block';document.getElementById('filePreview').textContent='Selected: '+selectedFile.name+' ('+Math.round(selectedFile.size/1024)+'KB)';document.getElementById('fileUrl').value='';}}
+async function addFile(){var property_id=document.getElementById('fileProperty').value,name=document.getElementById('fileName').value.trim(),file_type=document.getElementById('fileType').value,url=document.getElementById('fileUrl').value.trim();if(!property_id){toast('Select a property',true);return;}if(!name){toast('File name required',true);return;}if(!url&&!selectedFile){toast('Provide URL or upload file',true);return;}try{var r;if(url){r=await fetch('/api/admin/files',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'include',body:JSON.stringify({property_id,name,file_type,file_url:url})});}else{var fd=new FormData();fd.append('file',selectedFile);fd.append('property_id',property_id);fd.append('name',name);fd.append('file_type',file_type);r=await fetch('/api/admin/files/upload',{method:'POST',credentials:'include',body:fd});}var d=await r.json();if(r.ok){toast('File added');closeModal('addFileModal');document.getElementById('fileName').value='';document.getElementById('fileUrl').value='';selectedFile=null;document.getElementById('filePreview').style.display='none';loadFiles();updateStats();}else{toast(d.error||'Failed',true);}}catch(e){toast('Error adding file',true);}}
+async function deleteFile(id){if(!confirm('Delete this file?'))return;await fetch('/api/admin/files/'+id,{method:'DELETE',credentials:'include'});toast('File deleted');loadFiles();updateStats();}
+async function loadActivity(){try{var r=await fetch('/api/admin/activity',{credentials:'include'});activity=await r.json();renderActivity();}catch(e){}}
+function renderActivity(){var list=document.getElementById('activityList');if(!activity.length){list.innerHTML='<div class="activity-item"><span class="activity-dot"></span><span class="activity-text" style="color:var(--grey)">No activity yet.</span></div>';return;}list.innerHTML=activity.slice(0,50).map(function(a){return '<div class="activity-item"><span class="activity-dot"></span><span class="activity-text">'+(a.buyer_name||'Unknown')+' - '+(a.action||'visited')+'</span><span class="activity-time">'+new Date(a.created_at).toLocaleString('en-AU',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})+'</span></div>';}).join('');}
+async function saveAgentSettings(e){e.preventDefault();var data={name:document.getElementById('agentName').value,title:document.getElementById('agentTitle').value,phone:document.getElementById('agentPhone').value,whatsapp:document.getElementById('agentWhatsapp').value,email:document.getElementById('agentEmail').value,photo_url:document.getElementById('agentPhoto').value};try{var r=await fetch('/api/admin/settings/agent',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'include',body:JSON.stringify(data)});if(r.ok)toast('Agent details saved');else toast('Failed',true);}catch(e){toast('Error',true);}}
+async function addAdmin(e){e.preventDefault();var username=document.getElementById('newAdminUser').value,password=document.getElementById('newAdminPass').value,display_name=document.getElementById('newAdminName').value;try{var r=await fetch('/api/admin/admins',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'include',body:JSON.stringify({username,password,display_name})});var d=await r.json();if(r.ok){toast('Admin added');document.getElementById('addAdminForm').reset();}else toast(d.error||'Failed',true);}catch(e){toast('Error',true);}}
+var uz=document.getElementById('uploadZone');if(uz){uz.addEventListener('dragover',function(e){e.preventDefault();uz.classList.add('drag-over');});uz.addEventListener('dragleave',function(){uz.classList.remove('drag-over');});uz.addEventListener('drop',function(e){e.preventDefault();uz.classList.remove('drag-over');var f=e.dataTransfer.files[0];if(f){document.getElementById('fileInput').files=e.dataTransfer.files;handleFileSelect(document.getElementById('fileInput'));}});}
 </script>
 </body>
 </html>
