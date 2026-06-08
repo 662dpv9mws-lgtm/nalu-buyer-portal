@@ -8,7 +8,7 @@ const nodemailer = require('nodemailer');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const multer = require('multer');
-const Database = require('better-sqlite3');
+const Database = require('better-sqlite3')
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -155,11 +155,7 @@ app.get('/auth/magic/:token', (req, res) => {
 });
 
 app.get('/portal/:token', (req, res) => {
-  const buyer = db.prepare('SELECT * FROM buyers WHERE portal_token=?').get(req.params.token);
-  if (!buyer) return res.status(404).sendFile(path.join(__dirname,'public','404.html'));
-  db.prepare('UPDATE buyers SET last_visited=CURRENT_TIMESTAMP WHERE id=?').run(buyer.id);
-  logAct(buyer.id,'portal_viewed',req.params.token);
-  res.sendFile(path.join(__dirname,'public','portal.html'));
+    res.sendFile(path.join(__dirname,'public','portal.html'));
 });
 
 app.get('/api/portal/:token', (req, res) => {
@@ -279,6 +275,6 @@ app.get('/api/admin/activity',adminAuth,(req,res)=>{
   else{res.json(db.prepare('SELECT a.*,b.name as buyer_name,b.email as buyer_email FROM activity a JOIN buyers b ON b.id=a.buyer_id ORDER BY a.created_at DESC LIMIT 200').all());}
 });
 
-app.get('/',(req,res)=>res.redirect('/login'));
+app.get('/',(req,res)=>res.sendFile(path.join(__dirname,'public','portal.html')));
 app.use((req,res)=>res.status(404).sendFile(path.join(__dirname,'public','404.html')));
 app.listen(PORT,()=>console.log('Nalu Buyer Portal running on port '+PORT));
