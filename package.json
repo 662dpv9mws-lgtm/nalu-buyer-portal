@@ -1,0 +1,27 @@
+{
+    "name": "nalu-buyer-portal",
+    "version": "1.0.0",
+    "description": "Nalu by Monaco buyer portal with magic link authentication",
+    "main": "server.js",
+    "scripts": {
+          "start": "node server.js",
+          "dev": "nodemon server.js"
+    },
+    "dependencies": {
+          "express": "^4.18.2",
+          "express-session": "^1.17.3",
+          "better-sqlite3": "^9.4.3",
+          "nodemailer": "^6.9.10",
+          "jsonwebtoken": "^9.0.2",
+          "bcryptjs": "^2.4.3",
+          "nanoid": "^3.3.7",
+          "multer": "^1.4.5-lts.1",
+          "dotenv": "^16.4.1"
+    },
+    "devDependencies": {
+          "nodemon": "^3.0.3"
+    },
+    "engines": {
+          "node": ">=18.0.0"
+    }
+}
