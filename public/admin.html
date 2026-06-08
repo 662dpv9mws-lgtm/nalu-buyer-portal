@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin | Nalu by Monaco</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:#0a0a0a;color:#fff;font-family:Georgia,serif;display:flex;min-height:100vh;}
+nav{width:220px;min-height:100vh;background:#0d0d0d;border-right:1px solid #1a1a1a;display:flex;flex-direction:column;padding:24px 0;flex-shrink:0;}
+.nav-logo{color:#c9a84c;letter-spacing:4px;font-size:16px;padding:0 20px 24px;border-bottom:1px solid #1a1a1a;margin-bottom:8px;}
+.nav-item{padding:14px 20px;cursor:pointer;font-size:12px;letter-spacing:2px;color:#666;border-left:3px solid transparent;}
+.nav-item:hover{color:#fff;background:#111;}
+.nav-item.active{color:#c9a84c;border-left-color:#c9a84c;background:#111;}
+.nav-footer{margin-top:auto;padding:20px;border-top:1px solid #1a1a1a;}
+.nav-admin{font-size:12px;color:#666;margin-bottom:10px;}
+.nav-logout{color:#c9a84c;font-size:11px;letter-spacing:1px;cursor:pointer;}
+main{flex:1;padding:40px;overflow-y:auto;}
+h2{font-size:28px;font-weight:normal;margin-bottom:4px;}
+.sub{color:#555;font-size:13px;margin-bottom:32px;}
+hr{border:none;border-top:1px solid #1a1a1a;margin-bottom:32px;}
+.btn{background:#c9a84c;color:#000;border:none;padding:12px 24px;font-size:11px;letter-spacing:2px;cursor:pointer;font-weight:bold;font-family:Georgia,serif;}
+.btn:hover{background:#b8963e;}
+.btn-sm{padding:6px 14px;font-size:10px;}
+.btn-outline{background:none;border:1px solid #c9a84c;color:#c9a84c;}
+.btn-outline:hover{background:#c9a84c;color:#000;}
+.btn-danger{background:none;border:1px solid #c0392b;color:#c0392b;}
+.btn-danger:hover{background:#c0392b;color:#fff;}
+table{width:100%;border-collapse:collapse;}
+th{text-align:left;color:#666;font-size:10px;letter-spacing:2px;padding:12px 16px;border-bottom:1px solid #1a1a1a;font-weight:normal;}
+td{padding:14px 16px;border-bottom:1px solid #111;font-size:13px;vertical-align:middle;}
+tr:hover td{background:#0d0d0d;}
+.portal-token{font-size:11px;color:#666;font-family:monospace;}
+.badge{background:#1a2b1a;color:#4caf82;padding:3px 8px;font-size:10px;letter-spacing:1px;}
+.section{display:none;}
+.section.active{display:block;}
+.modal-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);z-index:100;display:flex;align-items:center;justify-content:center;}
+.modal{background:#111;border:1px solid #222;padding:40px;width:100%;max-width:480px;max-height:90vh;overflow-y:auto;}
+.modal h3{font-size:20px;font-weight:normal;margin-bottom:24px;color:#c9a84c;}
+.form-group{margin-bottom:20px;}
+label{display:block;color:#666;font-size:10px;letter-spacing:2px;margin-bottom:8px;}
+input,select,textarea{width:100%;background:#0a0a0a;border:1px solid #333;color:#fff;padding:12px 14px;font-size:13px;outline:none;font-family:Georgia,serif;}
+input:focus,select:focus,textarea:focus{border-color:#c9a84c;}
+select option{background:#111;}
+.modal-btns{display:flex;gap:12px;margin-top:24px;}
+.prop-checkbox{display:flex;align-items:center;gap:10px;padding:10px;border:1px solid #1a1a1a;margin-bottom:6px;cursor:pointer;}
+.prop-checkbox:hover{border-color:#333;}
+.prop-checkbox input[type=checkbox]{width:auto;margin:0;}
+.link-box{background:#0a0a0a;border:1px solid #333;padding:12px;font-family:monospace;font-size:12px;word-break:break-all;color:#c9a84c;margin:12px 0;}
+.activity-item{padding:14px;border-bottom:1px solid #111;display:flex;gap:16px;align-items:flex-start;}
+.activity-dot{width:8px;height:8px;background:#c9a84c;border-radius:50%;margin-top:5px;flex-shrink:0;}
+.activity-time{color:#555;font-size:11px;}
+.file-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid #111;}
+.file-row-info{display:flex;align-items:center;gap:10px;}
+.tab-row{display:flex;gap:1px;margin-bottom:24px;}
+.tab{padding:10px 20px;background:#111;color:#666;cursor:pointer;font-size:11px;letter-spacing:1px;}
+.tab.active{background:#c9a84c;color:#000;}
+.alert{padding:14px;margin-bottom:16px;border:1px solid;font-size:13px;}
+.alert.success{background:#0d2b1a;border-color:#1a5c36;color:#4caf82;}
+.alert.error{background:#2b0d0d;border-color:#5c1a1a;color:#f47878;}
+</style>
+</head>
+<body>
+<nav>
+  <div class="nav-logo">NALU BY MONACO</div>
+  <div class="nav-item active" onclick="showSection('buyers')">BUYERS</div>
+  <div class="nav-item" onclick="showSection('properties')">PROPERTIES</div>
+  <div class="nav-item" onclick="showSection('files')">FILES</div>
+  <div class="nav-item" onclick="showSection('activity')">ACTIVITY</div>
+  <div class="nav-item" onclick="showSection('settings')">SETTINGS</div>
+  <div class="nav-footer">
+    <div class="nav-admin" id="nav-admin-name"></div>
+    <div class="nav-logout" onclick="logout()">LOGOUT</div>
+  </div>
+</nav>
+<main>
+
+<!-- BUYERS -->
+<div id="section-buyers" class="section active">
+  <h2>Manage Buyers</h2><p class="sub">Add and manage buyer accounts</p><hr>
+  <div id="buyers-alert"></div>
+  <button class="btn" onclick="showAddBuyerModal()" style="margin-bottom:24px;">+ ADD BUYER</button>
+  <table>
+    <tr><th>NAME</th><th>EMAIL</th><th>LAST VISITED</th><th>ACTIVITY</th><th>ACTIONS</th></tr>
+    <tbody id="buyers-table"></tbody>
+  </table>
+</div>
+
+<!-- PROPERTIES -->
+<div id="section-properties" class="section">
+  <h2>Manage Properties</h2><p class="sub">Add properties and assign them to buyers</p><hr>
+  <div id="props-alert"></div>
+  <button class="btn" onclick="showAddPropertyModal()" style="margin-bottom:24px;">+ ADD PROPERTY</button>
+  <table>
+    <tr><th>NAME</th><th>ADDRESS</th><th>PRICE</th><th>AGENT</th><th>FILES</th><th>ACTIONS</th></tr>
+    <tbody id="properties-table"></tbody>
+  </table>
+</div>
+
+<!-- FILES -->
+<div id="section-files" class="section">
+  <h2>Manage Files</h2><p class="sub">Add Dropbox links or upload files for properties</p><hr>
+  <div id="files-alert"></div>
+  <div class="form-group"><label>SELECT PROPERTY</label>
+    <select id="files-property-select" onchange="loadPropertyFiles()"><option value="">Choose a property...</option></select>
+  </div>
+  <div id="files-container"></div>
+  <div id="add-file-form" style="display:none;margin-top:24px;background:#111;border:1px solid #1a1a1a;padding:24px;">
+    <h3 style="font-size:16px;font-weight:normal;margin-bottom:20px;color:#c9a84c;">ADD FILE / LINK</h3>
+    <div class="tab-row">
+      <div class="tab active" onclick="switchFileTab('url')">DROPBOX / URL</div>
+      <div class="tab" onclick="switchFileTab('upload')">UPLOAD FILE</div>
+    </div>
+    <div id="file-tab-url">
+      <div class="form-group"><label>FILE NAME</label><input type="text" id="file-url-name" placeholder="e.g. Floor Plan"></div>
+      <div class="form-group"><label>FILE TYPE</label><select id="file-url-type"><option value="document">Document (PDF)</option><option value="image">Image (Render/Photo)</option></select></div>
+      <div class="form-group"><label>DROPBOX / EXTERNAL URL</label><input type="url" id="file-url-link" placeholder="https://www.dropbox.com/s/..."></div>
+      <button class="btn btn-sm" onclick="addFileByUrl()">ADD LINK</button>
+    </div>
+    <div id="file-tab-upload" style="display:none;">
+      <div class="form-group"><label>FILE NAME (optional)</label><input type="text" id="file-upload-name" placeholder="Leave blank to use filename"></div>
+      <div class="form-group"><label>FILE TYPE</label><select id="file-upload-type"><option value="document">Document (PDF)</option><option value="image">Image (Render/Photo)</option></select></div>
+      <div class="form-group"><label>CHOOSE FILE</label><input type="file" id="file-upload-input"></div>
+      <button class="btn btn-sm" onclick="uploadFile()">UPLOAD</button>
+    </div>
+  </div>
+</div>
+
+<!-- ACTIVITY -->
+<div id="section-activity" class="section">
+  <h2>Activity Timeline</h2><p class="sub">Track buyer engagement</p><hr>
+  <div class="form-group"><label>FILTER BY BUYER</label>
+    <select id="activity-buyer-select" onchange="loadActivity()"><option value="">All Buyers</option></select>
+  </div>
+  <div id="activity-container"></div>
+</div>
+
+<!-- SETTINGS -->
+<div id="section-settings" class="section">
+  <h2>Settings</h2><p class="sub">Manage admin accounts</p><hr>
+  <div id="settings-alert"></div>
+  <button class="btn" onclick="showAddAdminModal()" style="margin-bottom:24px;">+ ADD ADMIN</button>
+  <table><tr><th>USERNAME</th><th>DISPLAY NAME</th><th>PHONE</th><th>CREATED</th></tr>
+    <tbody id="admins-table"></tbody>
+  </table>
+</div>
+
+</main>
+
+<!-- MODALS -->
+<div id="modal-overlay" style="display:none;" class="modal-overlay" onclick="closeModal(event)">
+  <div id="modal-content" class="modal" onclick="event.stopPropagation()"></div>
+</div>
+
+<script>
+let adminToken='';
+let allBuyers=[];
+let allProperties=[];
+let allAdmins=[];
+let currentFilePropertyId=null;
+
+// Init
+(async()=>{
+  const r=await fetch('/api/admin/me',{credentials:'include'});
+  if(!r.ok){window.location.href='/admin/login';return;}
+  const a=await r.json();
+  adminToken='session';
+  document.getElementById('nav-admin-name').textContent=a.display_name;
+  await Promise.all([loadBuyers(),loadProperties(),loadAdmins()]);
+})();
+
+function authHeaders(){return{'Content-Type':'application/json'};}
+
+async function logout(){
+  await fetch('/api/admin/logout',{method:'POST',credentials:'include'});
+  window.location.href='/admin/login';
+}
+
+function showSection(name){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(i=>i.classList.remove('active'));
+  document.getElementById('section-'+name).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(i=>{if(i.textContent.toLowerCase()===name)i.classList.add('active');});
+  if(name==='files')populateFilesPropertySelect();
+  if(name==='activity'){populateActivityBuyerSelect();loadActivity();}
+}
+
+function showAlert(containerId,msg,type='success'){
+  document.getElementById(containerId).innerHTML='<div class="alert '+type+'">'+msg+'</div>';
+  setTimeout(()=>{document.getElementById(containerId).innerHTML='';},4000);
+}
+
+function openModal(html){
+  document.getElementById('modal-content').innerHTML=html;
+  document.getElementById('modal-overlay').style.display='flex';
+}
+function closeModal(e){
+  if(!e||e.target===document.getElementById('modal-overlay'))document.getElementById('modal-overlay').style.display='none';
+}
+
+// BUYERS
+async function loadBuyers(){
+  const r=await fetch('/api/admin/buyers',{credentials:'include'});
+  allBuyers=await r.json();
+  renderBuyers();
+}
+
+function renderBuyers(){
+  const tb=document.getElementById('buyers-table');
+  if(!allBuyers.length){tb.innerHTML='<tr><td colspan="5" style="color:#444;text-align:center;padding:40px;">No buyers yet. Add your first buyer.</td></tr>';return;}
+  tb.innerHTML=allBuyers.map(b=>'<tr><td>'+b.name+'</td><td style="color:#888;">'+b.email+'</td><td style="color:#666;font-size:12px;">'+(b.last_visited?new Date(b.last_visited).toLocaleDateString('en-AU'):'Never')+'</td><td><span class="badge">'+b.activity_count+' events</span></td><td style="display:flex;gap:6px;flex-wrap:wrap;padding:10px 16px;"><button class="btn btn-sm btn-outline" onclick="sendLink('+b.id+')">SEND LINK</button><button class="btn btn-sm btn-outline" onclick="copyPortalLink('+b.id+')">PORTAL LINK</button><button class="btn btn-sm btn-outline" onclick="showAssignProps('+b.id+',''+b.name+'')">PROPERTIES</button><button class="btn btn-sm btn-danger" onclick="deleteBuyer('+b.id+',''+b.name+'')">DELETE</button></td></tr>').join('');
+}
+
+function showAddBuyerModal(){
+  openModal('<h3>ADD BUYER</h3><div class="form-group"><label>FULL NAME</label><input id="m-name" type="text"></div><div class="form-group"><label>EMAIL ADDRESS</label><input id="m-email" type="email"></div><div class="form-group"><label>PHONE (optional)</label><input id="m-phone" type="tel"></div><div class="modal-btns"><button class="btn" onclick="addBuyer()">ADD BUYER</button><button class="btn btn-outline" onclick="closeModal()">CANCEL</button></div><div id="m-err" style="margin-top:12px;"></div>');
+}
+
+async function addBuyer(){
+  const name=document.getElementById('m-name').value;
+  const email=document.getElementById('m-email').value;
+  const phone=document.getElementById('m-phone').value;
+  if(!name||!email){document.getElementById('m-err').innerHTML='<div class="alert error">Name and email required.</div>';return;}
+  const r=await fetch('/api/admin/buyers',{method:'POST',headers:authHeaders(),body:JSON.stringify({name,email,phone}),credentials:'include'});
+  const d=await r.json();
+  if(d.success){closeModal();await loadBuyers();showAlert('buyers-alert','Buyer added successfully.');}
+  else{document.getElementById('m-err').innerHTML='<div class="alert error">'+(d.error||'Error')+'</div>';}
+}
+
+async function deleteBuyer(id,name){
+  if(!confirm('Delete buyer '+name+'? This will remove all their data.'))return;
+  await fetch('/api/admin/buyers/'+id,{method:'DELETE',credentials:'include'});
+  await loadBuyers();
+  showAlert('buyers-alert','Buyer deleted.');
+}
+
+async function sendLink(id){
+  const btn=event.target;btn.textContent='SENDING...';btn.disabled=true;
+  const r=await fetch('/api/admin/buyers/'+id+'/send-link',{method:'POST',credentials:'include'});
+  const d=await r.json();
+  btn.textContent='SEND LINK';btn.disabled=false;
+  if(d.success){
+    openModal('<h3>LINK SENT</h3><p style="color:#888;margin-bottom:16px;">Magic link sent (or generated if email not configured):</p><div class="link-box">'+d.url+'</div><div class="modal-btns"><button class="btn btn-sm" onclick="navigator.clipboard.writeText(''+d.url+'').then(()=>alert('Copied!'))">COPY LINK</button><button class="btn btn-outline btn-sm" onclick="closeModal()">CLOSE</button></div>');
+  }
+}
+
+async function copyPortalLink(id){
+  const r=await fetch('/api/admin/buyers/'+id+'/portal-link',{credentials:'include'});
+  const d=await r.json();
+  openModal('<h3>DIRECT PORTAL LINK</h3><p style="color:#888;margin-bottom:16px;">This link gives permanent access without email verification:</p><div class="link-box">'+d.url+'</div><div class="modal-btns"><button class="btn btn-sm" onclick="navigator.clipboard.writeText(''+d.url+'').then(()=>alert('Copied!'))">COPY LINK</button><button class="btn btn-outline btn-sm" onclick="closeModal()">CLOSE</button></div>');
+}
+
+async function showAssignProps(buyerId,buyerName){
+  const r=await fetch('/api/admin/buyers/'+buyerId+'/properties',{credentials:'include'});
+  const assigned=await r.json();
+  const checks=allProperties.map(p=>'<div class="prop-checkbox"><input type="checkbox" id="prop-'+p.id+'" value="'+p.id+'"'+(assigned.includes(p.id)?' checked':'')+'><label for="prop-'+p.id+'" style="color:#fff;letter-spacing:0;font-size:13px;cursor:pointer;">'+p.name+'<span style="color:#555;font-size:11px;display:block;">'+p.address+'</span></label></div>').join('');
+  openModal('<h3>ASSIGN PROPERTIES TO '+buyerName.toUpperCase()+'</h3>'+checks+'<div class="modal-btns"><button class="btn" onclick="saveAssignedProps('+buyerId+')">SAVE</button><button class="btn btn-outline" onclick="closeModal()">CANCEL</button></div>');
+}
+
+async function saveAssignedProps(buyerId){
+  const checked=Array.from(document.querySelectorAll('.prop-checkbox input:checked')).map(el=>parseInt(el.value));
+  const r=await fetch('/api/admin/buyers/'+buyerId+'/properties',{credentials:'include'});
+  const current=await r.json();
+  for(const id of allProperties.map(p=>p.id)){
+    if(checked.includes(id)&&!current.includes(id)){await fetch('/api/admin/buyers/'+buyerId+'/properties/'+id,{method:'POST',credentials:'include'});}
+    if(!checked.includes(id)&&current.includes(id)){await fetch('/api/admin/buyers/'+buyerId+'/properties/'+id,{method:'DELETE',credentials:'include'});}
+  }
+  closeModal();showAlert('buyers-alert','Properties updated.');
+}
+
+// PROPERTIES
+async function loadProperties(){
+  const r=await fetch('/api/admin/properties',{credentials:'include'});
+  allProperties=await r.json();
+  renderProperties();
+}
+
+function renderProperties(){
+  const tb=document.getElementById('properties-table');
+  if(!allProperties.length){tb.innerHTML='<tr><td colspan="6" style="color:#444;text-align:center;padding:40px;">No properties yet.</td></tr>';return;}
+  tb.innerHTML=allProperties.map(p=>'<tr><td>'+p.name+'</td><td style="color:#888;font-size:12px;">'+p.address+'</td><td style="color:#c9a84c;">'+(p.price||'-')+'</td><td style="color:#666;font-size:12px;">'+(p.agent_name||'-')+'</td><td><span class="badge">'+p.file_count+' files</span></td><td style="display:flex;gap:6px;padding:10px 16px;"><button class="btn btn-sm btn-outline" onclick="showEditProperty('+p.id+')">EDIT</button><button class="btn btn-sm btn-danger" onclick="deleteProperty('+p.id+',''+p.name+'')">DELETE</button></td></tr>').join('');
+}
+
+function showAddPropertyModal(){
+  const agentOpts=allAdmins.map(a=>'<option value="'+a.id+'">'+a.display_name+'</option>').join('');
+  openModal('<h3>ADD PROPERTY</h3><div class="form-group"><label>PROPERTY NAME</label><input id="pm-name" type="text" placeholder="e.g. Surfers Paradise Penthouse"></div><div class="form-group"><label>ADDRESS</label><input id="pm-addr" type="text"></div><div class="form-group"><label>PRICE</label><input id="pm-price" type="text" placeholder="e.g. $2,500,000"></div><div class="form-group"><label>AVAILABILITY</label><input id="pm-avail" type="text" placeholder="e.g. Q4 2025 or Available Now"></div><div class="form-group"><label>AGENT</label><select id="pm-agent">'+agentOpts+'</select></div><div class="modal-btns"><button class="btn" onclick="addProperty()">ADD PROPERTY</button><button class="btn btn-outline" onclick="closeModal()">CANCEL</button></div><div id="pm-err"></div>');
+}
+
+async function addProperty(){
+  const name=document.getElementById('pm-name').value;
+  const address=document.getElementById('pm-addr').value;
+  const price=document.getElementById('pm-price').value;
+  const availability=document.getElementById('pm-avail').value;
+  const agent_id=document.getElementById('pm-agent').value;
+  if(!name||!address){document.getElementById('pm-err').innerHTML='<div class="alert error">Name and address required.</div>';return;}
+  const r=await fetch('/api/admin/properties',{method:'POST',headers:authHeaders(),body:JSON.stringify({name,address,price,availability,agent_id}),credentials:'include'});
+  const d=await r.json();
+  if(d.success){closeModal();await loadProperties();showAlert('props-alert','Property added.');}
+  else{document.getElementById('pm-err').innerHTML='<div class="alert error">'+(d.error||'Error')+'</div>';}
+}
+
+async function showEditProperty(id){
+  const p=allProperties.find(x=>x.id===id);
+  const agentOpts=allAdmins.map(a=>'<option value="'+a.id+'"'+(a.id===p.agent_id?' selected':'')+'>'+a.display_name+'</option>').join('');
+  openModal('<h3>EDIT PROPERTY</h3><div class="form-group"><label>NAME</label><input id="pm-name" value="'+p.name+'"></div><div class="form-group"><label>ADDRESS</label><input id="pm-addr" value="'+p.address+'"></div><div class="form-group"><label>PRICE</label><input id="pm-price" value="'+(p.price||'')+'"></div><div class="form-group"><label>AVAILABILITY</label><input id="pm-avail" value="'+(p.availability||'')+'"></div><div class="form-group"><label>AGENT</label><select id="pm-agent">'+agentOpts+'</select></div><div class="modal-btns"><button class="btn" onclick="editProperty('+id+')">SAVE</button><button class="btn btn-outline" onclick="closeModal()">CANCEL</button></div>');
+}
+
+async function editProperty(id){
+  const name=document.getElementById('pm-name').value;
+  const address=document.getElementById('pm-addr').value;
+  const price=document.getElementById('pm-price').value;
+  const availability=document.getElementById('pm-avail').value;
+  const agent_id=document.getElementById('pm-agent').value;
+  await fetch('/api/admin/properties/'+id,{method:'PUT',headers:authHeaders(),body:JSON.stringify({name,address,price,availability,agent_id}),credentials:'include'});
+  closeModal();await loadProperties();showAlert('props-alert','Property updated.');
+}
+
+async function deleteProperty(id,name){
+  if(!confirm('Delete property "'+name+'"? All associated files will be removed.'))return;
+  await fetch('/api/admin/properties/'+id,{method:'DELETE',credentials:'include'});
+  await loadProperties();showAlert('props-alert','Property deleted.');
+}
+
+// FILES
+function populateFilesPropertySelect(){
+  const sel=document.getElementById('files-property-select');
+  sel.innerHTML='<option value="">Choose a property...</option>'+allProperties.map(p=>'<option value="'+p.id+'">'+p.name+'</option>').join('');
+  document.getElementById('files-container').innerHTML='';
+  document.getElementById('add-file-form').style.display='none';
+}
+
+async function loadPropertyFiles(){
+  const propId=document.getElementById('files-property-select').value;
+  if(!propId){document.getElementById('files-container').innerHTML='';document.getElementById('add-file-form').style.display='none';return;}
+  currentFilePropertyId=propId;
+  const r=await fetch('/api/admin/properties/'+propId+'/files',{credentials:'include'});
+  const files=await r.json();
+  document.getElementById('add-file-form').style.display='block';
+  if(!files.length){document.getElementById('files-container').innerHTML='<p style="color:#444;margin-bottom:16px;">No files yet. Add a Dropbox link or upload a file below.</p>';return;}
+  document.getElementById('files-container').innerHTML='<div style="margin-bottom:24px;">'+files.map(f=>'<div class="file-row"><div class="file-row-info"><span>'+(f.type==='image'?'📷':'📄')+'</span><div><div>'+f.name+'</div><div style="color:#666;font-size:11px;font-family:monospace;">'+f.url.substring(0,60)+(f.url.length>60?'...':'')+'</div></div></div><button class="btn btn-sm btn-danger" onclick="deleteFile('+f.id+')">REMOVE</button></div>').join('')+'</div>';
+}
+
+function switchFileTab(tab){
+  document.querySelectorAll('.tab-row .tab').forEach(t=>t.classList.remove('active'));
+  event.target.classList.add('active');
+  document.getElementById('file-tab-url').style.display=tab==='url'?'block':'none';
+  document.getElementById('file-tab-upload').style.display=tab==='upload'?'block':'none';
+}
+
+async function addFileByUrl(){
+  const name=document.getElementById('file-url-name').value;
+  const type=document.getElementById('file-url-type').value;
+  const url=document.getElementById('file-url-link').value;
+  if(!name||!url){showAlert('files-alert','Name and URL required.','error');return;}
+  const r=await fetch('/api/admin/files',{method:'POST',headers:authHeaders(),body:JSON.stringify({property_id:currentFilePropertyId,name,type,url}),credentials:'include'});
+  const d=await r.json();
+  if(d.success){document.getElementById('file-url-name').value='';document.getElementById('file-url-link').value='';await loadPropertyFiles();showAlert('files-alert','File link added.');}
+  else{showAlert('files-alert',d.error||'Error','error');}
+}
+
+async function uploadFile(){
+  const fileInput=document.getElementById('file-upload-input');
+  if(!fileInput.files[0]){showAlert('files-alert','Please select a file.','error');return;}
+  const fd=new FormData();
+  fd.append('file',fileInput.files[0]);
+  fd.append('property_id',currentFilePropertyId);
+  fd.append('name',document.getElementById('file-upload-name').value);
+  fd.append('type',document.getElementById('file-upload-type').value);
+  const r=await fetch('/api/admin/files/upload',{method:'POST',body:fd,credentials:'include'});
+  const d=await r.json();
+  if(d.success){fileInput.value='';document.getElementById('file-upload-name').value='';await loadPropertyFiles();showAlert('files-alert','File uploaded.');}
+  else{showAlert('files-alert',d.error||'Error','error');}
+}
+
+async function deleteFile(id){
+  if(!confirm('Remove this file?'))return;
+  await fetch('/api/admin/files/'+id,{method:'DELETE',credentials:'include'});
+  await loadPropertyFiles();showAlert('files-alert','File removed.');
+}
+
+// ACTIVITY
+function populateActivityBuyerSelect(){
+  const sel=document.getElementById('activity-buyer-select');
+  sel.innerHTML='<option value="">All Buyers</option>'+allBuyers.map(b=>'<option value="'+b.id+'">'+b.name+'</option>').join('');
+}
+
+async function loadActivity(){
+  const buyerId=document.getElementById('activity-buyer-select').value;
+  const url='/api/admin/activity'+(buyerId?'?buyer_id='+buyerId:'');
+  const r=await fetch(url,{credentials:'include'});
+  const items=await r.json();
+  if(!items.length){document.getElementById('activity-container').innerHTML='<p style="color:#444;padding:40px 0;text-align:center;">No activity yet.</p>';return;}
+  document.getElementById('activity-container').innerHTML=items.map(i=>'<div class="activity-item"><div class="activity-dot"></div><div><div style="font-size:13px;">'+(i.buyer_name||'')+(i.action?' &mdash; '+i.action.replace(/_/g,' '):'')+'</div><div class="activity-time">'+new Date(i.created_at).toLocaleString('en-AU')+(i.detail?' &bull; '+i.detail:'')+'</div></div></div>').join('');
+}
+
+// SETTINGS / ADMINS
+async function loadAdmins(){
+  const r=await fetch('/api/admin/admins',{credentials:'include'});
+  allAdmins=await r.json();
+  const tb=document.getElementById('admins-table');
+  tb.innerHTML=allAdmins.map(a=>'<tr><td>'+a.username+'</td><td>'+a.display_name+'</td><td style="color:#888;">'+(a.phone||'-')+'</td><td style="color:#666;font-size:12px;">'+new Date(a.created_at).toLocaleDateString('en-AU')+'</td></tr>').join('');
+}
+
+function showAddAdminModal(){
+  openModal('<h3>ADD ADMIN USER</h3><div class="form-group"><label>USERNAME</label><input id="am-user" type="text"></div><div class="form-group"><label>PASSWORD</label><input id="am-pass" type="password"></div><div class="form-group"><label>DISPLAY NAME</label><input id="am-name" type="text"></div><div class="form-group"><label>PHONE</label><input id="am-phone" type="tel"></div><div class="form-group"><label>WHATSAPP NUMBER</label><input id="am-wa" type="tel" placeholder="e.g. 61412345678"></div><div class="modal-btns"><button class="btn" onclick="addAdmin()">ADD ADMIN</button><button class="btn btn-outline" onclick="closeModal()">CANCEL</button></div><div id="am-err"></div>');
+}
+
+async function addAdmin(){
+  const username=document.getElementById('am-user').value;
+  const password=document.getElementById('am-pass').value;
+  const display_name=document.getElementById('am-name').value;
+  const phone=document.getElementById('am-phone').value;
+  const whatsapp=document.getElementById('am-wa').value;
+  if(!username||!password||!display_name){document.getElementById('am-err').innerHTML='<div class="alert error">All required fields must be filled.</div>';return;}
+  const r=await fetch('/api/admin/admins',{method:'POST',headers:authHeaders(),body:JSON.stringify({username,password,display_name,phone,whatsapp}),credentials:'include'});
+  const d=await r.json();
+  if(d.success){closeModal();await loadAdmins();showAlert('settings-alert','Admin user created.');}
+  else{document.getElementById('am-err').innerHTML='<div class="alert error">'+(d.error||'Error')+'</div>';}
+}
+</script>
+</body>
+</html>
