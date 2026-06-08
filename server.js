@@ -43,6 +43,15 @@ db.exec(`
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,
     address TEXT NOT NULL,
+        unit_type TEXT,
+            level TEXT,
+                residence TEXT,
+                    aspect TEXT,
+                        beds TEXT,
+                            baths TEXT,
+                                cars TEXT,
+                                    sqm TEXT,
+                                        render_url TEXT,
     price TEXT,
     availability TEXT,
     agent_id INTEGER REFERENCES admins(id),
@@ -77,6 +86,10 @@ db.exec(`
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
   );
 `);
+
+// Migrate existing DB to add new columns
+const _pc=db.prepare('PRAGMA table_info(properties)').all().map(c=>c.name);
+['unit_type','level','residence','aspect','beds','baths','cars','sqm','render_url'].forEach(c=>{if(_pc.indexOf(c)===-1)db.prepare('ALTER TABLE properties ADD COLUMN '+c+' TEXT').run();});
 
 const adminCount = db.prepare('SELECT COUNT(*) as c FROM admins').get();
 if (adminCount.c === 0) {
