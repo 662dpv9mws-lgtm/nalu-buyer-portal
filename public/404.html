@@ -3,15 +3,27 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Not Found | Nalu by Monaco</title>
+<title>Page Not Found | Nalu by Monaco</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
-*{margin:0;padding:0;box-sizing:border-box;}
-body{background:#0a0a0a;color:#fff;font-family:Georgia,serif;min-height:100vh;display:flex;align-items:center;justify-content:center;text-align:center;}
-h1{color:#c9a84c;font-size:80px;font-weight:normal;letter-spacing:8px;}
-p{color:#555;font-size:14px;letter-spacing:2px;margin-top:16px;}
-a{color:#c9a84c;text-decoration:none;display:inline-block;margin-top:32px;border:1px solid #c9a84c;padding:12px 32px;font-size:11px;letter-spacing:3px;}
-a:hover{background:#c9a84c;color:#000;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  :root{--sand:#DFDACB;--sand-dark:#C8C3B0;--charcoal:#282828;--grey:#7A7A7A;--grey-light:#A8A8A8;--border:#C8C3B0;}
+  body{background:var(--sand);color:var(--charcoal);font-family:'Inter',sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;text-align:center;}
+  .number{font-family:'Cormorant Garamond',serif;font-size:120px;font-weight:300;color:var(--sand-dark);line-height:1;margin-bottom:16px;}
+  .title{font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:400;color:var(--charcoal);margin-bottom:8px;letter-spacing:2px;}
+  .sub{font-size:12px;color:var(--grey);margin-bottom:40px;line-height:1.6;}
+  .btn{display:inline-flex;padding:13px 32px;background:var(--charcoal);color:var(--sand);border-radius:2px;font-size:9px;letter-spacing:3px;text-transform:uppercase;text-decoration:none;font-weight:500;font-family:'Inter',sans-serif;transition:background 0.2s;}
+  .btn:hover{background:#3D3D3D;}
+  .footer{position:fixed;bottom:24px;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--grey-light);}
 </style>
 </head>
-<body><div><h1>404</h1><p>PAGE NOT FOUND</p><a href="/login">RETURN TO PORTAL</a></div></body>
+<body>
+  <div class="number">404</div>
+  <div class="title">Page Not Found</div>
+  <p class="sub">The page you are looking for does not exist<br>or your access link may have expired.</p>
+  <a href="/login" class="btn">Return to Portal</a>
+  <div class="footer">buyers.nalubymonaco.com.au</div>
+</body>
 </html>
