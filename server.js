@@ -331,6 +331,10 @@ app.post('/api/admin/admins', requireAdmin, (req, res) => {
 // Uploads static
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
+// Preview route - serves design preview without auth
+app.get('/preview', (req, res) => res.sendFile(path.join(__dirname, 'public', 'preview.html')));
+app.get('/preview.html', (req, res) => res.sendFile(path.join(__dirname, 'public', 'preview.html')));
+
 // 404
 app.use((req, res) => res.status(404).sendFile(path.join(__dirname, 'public', '404.html')));
 
